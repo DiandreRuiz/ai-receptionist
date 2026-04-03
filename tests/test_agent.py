@@ -35,6 +35,33 @@ async def test_greeting_identifies_company() -> None:
         result.expect.no_more_events()
 
 
+@pytest.mark.asyncio
+async def test_opening_turn_does_not_assume_booking_intent() -> None:
+    """After a simple hello, the agent does not jump into booking or assume scheduling."""
+    async with (
+        _llm() as llm,
+        AgentSession(llm=llm) as session,
+    ):
+        await session.start(Assistant())
+        result = await session.run(user_input="Hello")
+        await (
+            result.expect.next_event()
+            .is_message(role="assistant")
+            .judge(
+                llm,
+                intent="""
+                The response does not assume the caller is calling to book an
+                appointment. It must not open by saying it will book them,
+                schedule a visit, put them on the calendar, or start asking for
+                name and address for scheduling without the caller asking to
+                schedule first. Offering general help or asking how it can help
+                is appropriate.
+                """,
+            )
+        )
+        result.expect.no_more_events()
+
+
 # --- Booking Flow ---
 
 
