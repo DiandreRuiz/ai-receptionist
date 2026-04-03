@@ -27,10 +27,11 @@ INBOUND_GREETING_PATH = PROMPTS_DIR / "greeting.md"
 RECEPTIONIST_SYSTEM_PROMPT = SYSTEM_PROMPT_PATH.read_text()
 INBOUND_GREETING_INSTRUCTIONS = INBOUND_GREETING_PATH.read_text()
 
+
 class Assistant(Agent):
     def __init__(self) -> None:
         super().__init__(instructions=RECEPTIONIST_SYSTEM_PROMPT)
-    
+
     async def on_enter(self) -> None:
         self.session.generate_reply(instructions=INBOUND_GREETING_INSTRUCTIONS)
 
@@ -128,7 +129,6 @@ async def agent(ctx: JobContext):
 
     # Join the room and connect to the user
     await ctx.connect()
-    
 
 
 if __name__ == "__main__":

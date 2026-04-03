@@ -1,0 +1,29 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ["Tests"]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install LiveKit CLI
+      run: curl -sSL https://get.livekit.io/cli | bash
+
+    - name: Configure LiveKit project
+      run: |
+        lk project add production \
+          --url ${{ secrets.LIVEKIT_URL }} \
+          --api-key ${{ secrets.LIVEKIT_API_KEY }} \
+          --api-secret ${{ secrets.LIVEKIT_API_SECRET }} \
+          --default
+
+    - name: Deploy agent
+      run: lk agent deploy
