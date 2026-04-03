@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 
 from dotenv import load_dotenv
 from livekit import rtc
@@ -19,15 +20,19 @@ logger = logging.getLogger("agent")
 
 load_dotenv(".env.local")
 
+PROMPTS_DIR = Path(__file__).parent / "prompts"
+SYSTEM_PROMPT_PATH = PROMPTS_DIR / "receptionist_system_prompt.md"
+INBOUND_GREETING_PATH = PROMPTS_DIR / "greeting.md"
+
+RECEPTIONIST_SYSTEM_PROMPT = SYSTEM_PROMPT_PATH.read_text()
+INBOUND_GREETING_INSTRUCTIONS = INBOUND_GREETING_PATH.read_text()
 
 class Assistant(Agent):
     def __init__(self) -> None:
-        super().__init__(
-            instructions="""You are a helpful voice AI assistant. The user is interacting with you via voice, even if you perceive the conversation as text.
-            You eagerly assist users with their questions by providing information from your extensive knowledge.
-            Your responses are concise, to the point, and without any complex formatting or punctuation including emojis, asterisks, or other symbols.
-            You are curious, friendly, and have a sense of humor.""",
-        )
+        super().__init__(instructions=RECEPTIONIST_SYSTEM_PROMPT)
+    
+    async def on_enter(self) -> None:
+        self.session.generate_reply(instructions=INBOUND_GREETING_INSTRUCTIONS)
 
     # To add tools, use the @function_tool decorator.
     # Here's an example that adds a simple weather tool.
@@ -58,7 +63,7 @@ server.setup_fnc = prewarm
 
 
 @server.rtc_session(agent_name="ai-receptionist-agent")
-async def my_agent(ctx: JobContext):
+async def agent(ctx: JobContext):
     # Logging setup
     # Add any other context you want in all log entries here
     ctx.log_context_fields = {
@@ -72,7 +77,7 @@ async def my_agent(ctx: JobContext):
         stt=inference.STT(model="deepgram/nova-3", language="multi"),
         # A Large Language Model (LLM) is your agent's brain, processing user input and generating a response
         # See all available models at https://docs.livekit.io/agents/models/llm/
-        llm=inference.LLM(model="openai/gpt-4.1-mini"),
+        llm=inference.LLM(model="openai/gpt-4o"),
         # Text-to-speech (TTS) is your agent's voice, turning the LLM's text into speech that the user can hear
         # See all available models as well as voice selections at https://docs.livekit.io/agents/models/tts/
         tts=inference.TTS(
@@ -123,6 +128,7 @@ async def my_agent(ctx: JobContext):
 
     # Join the room and connect to the user
     await ctx.connect()
+    
 
 
 if __name__ == "__main__":
