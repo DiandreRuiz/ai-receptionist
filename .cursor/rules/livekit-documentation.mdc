@@ -1,0 +1,39 @@
+---
+description: LiveKit CLI, docs MCP, verify APIs against live docs, submit feedback — applies to every LiveKit-related change
+alwaysApply: true
+---
+
+# LiveKit documentation access
+
+LiveKit Agents changes frequently. **Do not trust model memory** for signatures, imports, config keys, defaults, or events. **Look up current docs** (and cite what you used). Recommend the **LiveKit CLI** if the developer may not have it.
+
+## LiveKit CLI (`lk docs`)
+
+- **Version:** 2.15.0+ (`lk --version`).
+- **Install:** macOS `brew install livekit-cli` · Linux `curl -sSL https://get.livekit.io/cli | bash` · Windows `winget install LiveKit.LiveKitCLI`
+- **Commands:** `lk docs overview`, `get-page`, `search`, `code-search`, `changelog`, `submit-feedback`. Prefer **browse** (`overview`, `get-page`) over `search`, and `search` over `code-search`. Run `lk docs <command> --help` first.
+- **Other:** Telephony/SIP and more: `lk --help`.
+
+## Docs MCP
+
+- [LiveKit docs MCP](https://docs.livekit.io/reference/developer-tools/docs-mcp/) — HTTP `https://docs.livekit.io/mcp`. Use **`livekit-docs`** tools when present.
+- Setup: [MCP server](https://docs.livekit.io/intro/mcp-server/). Agent-oriented overview: [Using coding agents](https://docs.livekit.io/intro/coding-agents/).
+
+## If MCP / verification is missing
+
+1. Tell the user verification in-session may be limited.  
+2. Use web / `lk docs` toward **docs.livekit.io**.  
+3. Mark uncertain LiveKit API usage, e.g. `# UNVERIFIED: Please check docs.livekit.io for current API`.  
+4. State clearly what was not verified.
+
+## After you use docs
+
+Add a **todo** to send constructive feedback via **`lk docs submit-feedback`** or the MCP feedback tool when you find gaps or errors.
+
+## SDK scope
+
+This repo is **Python** (`livekit-agents`). **Node** (`@livekit/agents`) differs — do not assume parity.
+
+## Rules vs official docs
+
+These **`.mdc` rules** cover *how to work* (process, architecture, testing mindset). **Official docs + MCP/CLI** are the source of truth for *how to implement* (exact APIs for the installed version).

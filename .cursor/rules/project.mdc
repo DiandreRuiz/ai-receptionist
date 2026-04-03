@@ -1,0 +1,27 @@
+---
+description: Python LiveKit Agents repo layout, uv, Ruff, entrypoint, workflows — always read first for any task
+alwaysApply: true
+---
+
+# This project
+
+- **Stack:** [LiveKit Agents](https://github.com/livekit/agents) (Python) for voice AI; intended for **LiveKit Cloud**. Product and setup context: **`README.md`**.
+- **Package manager:** Always **`uv`** — install, run the agent, run tests (`uv sync`, `uv run …`).
+- **Layout:** Code under **`src/`**. Keep **`agent.py` as the entrypoint** (see Dockerfile). Extra modules are fine.
+- **Format/lint:** `uv run ruff format` and `uv run ruff check`.
+
+## Workflows (latency)
+
+Prefer **handoffs** and **tasks** over one huge prompt for every phase. Minimize tools and context per LLM call. Docs: [workflows](https://docs.livekit.io/agents/build/workflows/).
+
+## When to open `README.md`
+
+Use **`README.md`** (not only rules) for: first-time setup; **`uv run python src/agent.py download-files`**; **`console` / `dev` / `start`**; evals; Docker/deploy; **`uv.lock`** / **`livekit.toml`**; linked web/mobile/telephony starters; **self-host vs Cloud** (plugins vs Inference).
+
+## Where coding-agent guidance lives
+
+Substance is in **`.cursor/rules/*.mdc`**. **`AGENTS.md`** is only a pointer for tools that require it.
+
+**Glob-scoped rules:** `livekit-voice-agents.mdc` and `livekit-testing.mdc` attach when **`src/**/*.py`** or **`tests/**/*.py`** are in context. For design-only chats, include those paths (e.g. open a file) so those rules apply.
+
+For LiveKit APIs, still use **`lk docs`**, **LiveKit docs MCP** (`livekit-docs`), or [docs.livekit.io](https://docs.livekit.io) — rules do not replace current API docs.

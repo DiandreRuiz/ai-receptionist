@@ -1,0 +1,49 @@
+---
+description: LiveKit Cloud, Inference, voice architecture, handoffs/tasks, pre-code checklist — when editing agent code or tests
+globs: src/**/*.py,tests/**/*.py
+alwaysApply: false
+---
+
+# LiveKit voice agents (Cloud-first)
+
+Opinionated *approach* for this repo — not API reference. **Verify all APIs** via docs/MCP/CLI.
+
+**Audience:** LiveKit Cloud. **Self-host:** Inference and Cloud noise-cancellation assumptions may not apply; use **plugins** and current [self-hosting](https://docs.livekit.io/transport/self-hosting/local/) / [plugins](https://docs.livekit.io/agents/models/#plugins) docs.
+
+## Before changing agent code — checklist
+
+1. Review **`.cursor/rules`** (this file + `livekit-testing.mdc` + `livekit-verification.mdc` when attached). MCP does **not** replace them.  
+2. **`LIVEKIT_URL`**, **`LIVEKIT_API_KEY`**, **`LIVEKIT_API_SECRET`** when running against LiveKit (often `.env.local`).  
+3. **Doc access:** `livekit-docs` MCP and/or `lk docs`.  
+4. **Tests:** plan updates; follow **`livekit-testing.mdc`**.  
+5. **APIs:** confirm in live docs — never from memory alone.
+
+## Cloud and Inference
+
+Cloud gives managed infra, turn detection, noise cancellation, and **LiveKit Inference** (models through LiveKit billing/credentials — check current docs for models and usage). CLI can help with credentials.
+
+## Latency and context
+
+- Shrink LLM context; avoid extra tool calls in tight loops; prefer streaming; plan for timeouts.  
+- Large prompts and many tools **slow voice agents** — only what the **current phase** needs.  
+- **Voice UX:** short replies, first delivery must be clear, expect **interruptions**, avoid long silence without acknowledgment.
+
+## Handoffs and tasks
+
+Monolithic agents accumulate too many tools, instructions, and state → latency and failures. Use **handoffs** for phases or specialists; **tasks** for narrow outcomes. Implementation: [workflows](https://docs.livekit.io/agents/build/workflows/) (verify current API).
+
+## When to consult official docs
+
+Always for: method signatures, config options, version-specific behavior, deployment, model integration, CLI flags.
+
+## Docs feedback
+
+If docs were wrong or unclear, note it and use **`lk docs submit-feedback`** or MCP feedback after the main task.
+
+## Common mistakes
+
+One agent “does everything”; ignoring latency until prod; copying examples without understanding; skipping tests because “it’s prompts”; trusting training data for LiveKit APIs.
+
+## Summary
+
+Cloud + Inference as default; **verify everything**; **minimize latency and context**; **handoffs/tasks** for complexity; **test behavior**; **keep tools/prompts phase-local**.

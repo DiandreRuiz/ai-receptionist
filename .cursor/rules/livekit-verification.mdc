@@ -1,0 +1,84 @@
+---
+description: API freshness, verification discipline, user-facing phrasing, drift examples — any LiveKit-related work
+alwaysApply: true
+---
+
+# Verification and freshness (LiveKit)
+
+Training data is **stale** for LiveKit: old docs, blogs, prior SDK shapes, and community answers diverge from **today’s** SDK.
+
+## Before writing LiveKit code
+
+1. Decide what must be verified: names/signatures, config types, imports, defaults.  
+2. Query **current** docs (MCP `livekit-docs`, `lk docs`, or docs.livekit.io).  
+3. **Cite** the page/section you used, or say you could not verify.
+
+## During implementation
+
+| Element | Why it drifts | How to verify |
+|--------|----------------|---------------|
+| Imports | Module moves | Doc search for import path |
+| Signatures | API evolution | API reference / get-page |
+| Config keys | Renames/types | Configuration docs |
+| Defaults | Tuning | Parameter docs |
+| Events/callbacks | API changes | Events docs |
+
+## After implementation
+
+Confirm used APIs appear in current docs; watch deprecations; align examples with current patterns.
+
+## What docs cannot prove
+
+Environment quirks, integration with this app’s code, and business rules — label as **application-specific** or **uncertain**, not “per LiveKit docs.”
+
+## Red flags — stop and verify
+
+Typing from **memory** without a fresh lookup; **“I think”** about LiveKit APIs; **complex** config; **error** shapes; **new** platform features.
+
+## Phrasing for users
+
+**Verified:** “According to LiveKit documentation (…), …”
+
+**Partial:** “This matches documented workflow patterns; I could not verify [X] for your SDK version — please confirm.”
+
+**Unverified:** “I could not verify against current LiveKit documentation. Check [docs.livekit.io](https://docs.livekit.io) and test before relying on this.”
+
+Do **not** imply verification if MCP/docs were unavailable.
+
+## MCP unavailable
+
+Tell the user; recommend [MCP / docs setup](https://docs.livekit.io/intro/mcp-server/); mark code **UNVERIFIED**; suggest manual doc check.
+
+## SDK versions
+
+**Python** (`livekit-agents`) vs **Node** (`@livekit/agents`) — different release lines; no assumed parity.
+
+## Drift examples (illustrative only — always confirm in docs)
+
+Configuration style may change across versions:
+
+```python
+# May be outdated — verify
+# agent = VoiceAgent(config={"model": "gpt-4"})
+```
+
+```python
+# Illustrative only — verify current constructor pattern
+# agent = VoiceAgent(llm=SomeLLMClass(...))
+```
+
+Methods and imports move:
+
+```python
+# agent.start_session()  # may have been renamed
+# agent.start()          # verify current API
+```
+
+```python
+# from livekit.agents.voice import VoiceAgent  # may have moved
+# from livekit.agents import VoiceAgent        # verify current import
+```
+
+## Summary
+
+**Distrust memory** for LiveKit APIs; **verify actively**; **communicate** gaps; **cite** sources; **prioritize** doc access (CLI/MCP).
