@@ -1,4 +1,4 @@
-"""Static knowledge assets (FAQ, regional jobs, ZIP coverage) for the receptionist agent."""
+"""Static knowledge assets (FAQ, Cartesia TTS notes, regional jobs, ZIP coverage)."""
 
 from .loaders import KnowledgeBundle, load_knowledge_dir
 

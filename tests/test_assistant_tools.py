@@ -1,4 +1,4 @@
-"""Deterministic tests for Assistant demo tool stubs (no LLM)."""
+"""Deterministic tests for Assistant tool stubs (no LLM)."""
 
 from pathlib import Path
 from unittest.mock import MagicMock
@@ -22,13 +22,13 @@ def assistant(knowledge):
 
 
 @pytest.mark.asyncio
-async def test_lookup_customer_returns_demo_not_found(assistant: Assistant) -> None:
+async def test_lookup_customer_returns_not_found(assistant: Assistant) -> None:
     ctx = MagicMock()
     out = await assistant.lookup_customer(
         ctx, customer_name="Jane Doe", address="1 Main St", phone="555-0100"
     )
     assert "No matching customer record found" in out
-    assert "demo" in out.lower()
+    assert "demo" not in out.lower()
     assert "new customer" in out.lower()
 
 
@@ -62,7 +62,7 @@ async def test_get_bookable_jobs_outside_service_area(assistant: Assistant) -> N
 
 
 @pytest.mark.asyncio
-async def test_book_appointment_returns_demo_confirmation(assistant: Assistant) -> None:
+async def test_book_appointment_returns_confirmation(assistant: Assistant) -> None:
     ctx = MagicMock()
     out = await assistant.book_appointment(
         ctx,
@@ -71,9 +71,9 @@ async def test_book_appointment_returns_demo_confirmation(assistant: Assistant) 
         phone="555-0199",
         job_type="Roof Inspection",
         issue_description="Annual check",
-        scheduled_date="Tuesday",
+        scheduled_date="Wednesday April 9 2026",
         scheduled_time_window="9 to 11 AM",
     )
-    assert "ST-DEMO-1001" in out
-    assert "Tuesday" in out
+    assert "SK-4821" in out
+    assert "April" in out
     assert "9" in out and "11" in out

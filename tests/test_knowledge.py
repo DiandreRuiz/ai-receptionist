@@ -46,3 +46,10 @@ def test_palm_beach_gardens_two_job_types_only() -> None:
 def test_unknown_zip_not_served() -> None:
     kb = load_knowledge_dir(KNOWLEDGE_ROOT)
     assert kb.region_for_zip("90210") is None
+
+
+def test_cartesia_tts_best_practices_packaged() -> None:
+    kb = load_knowledge_dir(KNOWLEDGE_ROOT)
+    text = kb.cartesia_tts_best_practices_markdown
+    assert "Sonic-3" in text
+    assert "MM/DD/YYYY" in text

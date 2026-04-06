@@ -1,3 +1,4 @@
+import asyncio
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -8,12 +9,14 @@ from livekit.agents import (
     AgentSession,
     JobContext,
     JobProcess,
+    TurnHandlingOptions,
     cli,
     inference,
     room_io,
 )
+from livekit.agents.beta.tools import EndCallTool
 from livekit.plugins import noise_cancellation, silero
-from livekit.plugins.turn_detector.multilingual import MultilingualModel
+from livekit.plugins.turn_detector.english import EnglishModel
 
 from knowledge.loaders import KnowledgeBundle, load_knowledge_dir
 from tools import ReceptionistTools
@@ -28,18 +31,79 @@ KNOWLEDGE_DIR = Path(__file__).resolve().parent / "knowledge"
 INBOUND_GREETING_INSTRUCTIONS = INBOUND_GREETING_PATH.read_text()
 
 
-def build_system_instructions(knowledge: KnowledgeBundle) -> str:
+def build_system_instructions(
+    knowledge: KnowledgeBundle,
+    *,
+    caller_phone: str | None = None,
+) -> str:
     base = SYSTEM_PROMPT_PATH.read_text()
+    if caller_phone:
+        line_ctx = (
+            "# Inbound line (session fact)\n\n"
+            f"The caller ID on this inbound line is **{caller_phone}** (from SIP). "
+            "You may read it back digit-by-digit when confirming the callback number, "
+            "following the Cartesia spelling-out guidance below. "
+            "If the caller says it is wrong, use the number they give instead."
+        )
+    else:
+        line_ctx = (
+            "# Inbound line (session fact)\n\n"
+            "You do **not** have this caller's phone number on this connection "
+            "(e.g. console test, web client, or hidden caller ID per trunk/dispatch rules). "
+            "Do **not** say you can see their number or read digits back unless they spoke a number. "
+            "Still ask **“Is this the best number to contact you on?”** as in your booking rules."
+        )
     return (
         f"{base.rstrip()}\n\n---\n\n"
-        f"# Approved FAQ (verbatim when it matches)\n\n{knowledge.faq_markdown}"
+        f"{line_ctx}\n\n"
+        f"---\n\n"
+        f"# Approved FAQ (verbatim when it matches)\n\n{knowledge.faq_markdown}\n\n"
+        f"---\n\n"
+        f"# Cartesia Sonic-3 TTS (format assistant text for synthesis)\n\n"
+        f"{knowledge.cartesia_tts_best_practices_markdown}"
     )
 
 
+def _sip_caller_phone_from_room(room: rtc.Room) -> str | None:
+    for p in room.remote_participants.values():
+        if p.kind != rtc.ParticipantKind.PARTICIPANT_KIND_SIP:
+            continue
+        raw = p.attributes.get("sip.phoneNumber")
+        if raw:
+            return str(raw).strip()
+    return None
+
+
+async def resolve_sip_caller_phone(ctx: JobContext) -> str | None:
+    """SIP caller ID when available (see LiveKit `sip.phoneNumber` on SIP participants)."""
+    found = _sip_caller_phone_from_room(ctx.room)
+    if found or ctx.is_fake_job():
+        return found
+    try:
+        p = await asyncio.wait_for(
+            ctx.wait_for_participant(kind=rtc.ParticipantKind.PARTICIPANT_KIND_SIP),
+            timeout=5.0,
+        )
+    except TimeoutError:
+        return None
+    raw = p.attributes.get("sip.phoneNumber")
+    return str(raw).strip() if raw else None
+
+
 class Assistant(ReceptionistTools, Agent):
-    def __init__(self, knowledge: KnowledgeBundle | None = None) -> None:
+    def __init__(
+        self,
+        knowledge: KnowledgeBundle | None = None,
+        *,
+        with_end_call_tool: bool = False,
+        caller_phone: str | None = None,
+    ) -> None:
         kb = knowledge or load_knowledge_dir(KNOWLEDGE_DIR)
-        super().__init__(instructions=build_system_instructions(kb))
+        hangup_tools = [EndCallTool()] if with_end_call_tool else []
+        super().__init__(
+            instructions=build_system_instructions(kb, caller_phone=caller_phone),
+            tools=hangup_tools,
+        )
         self._knowledge = kb
 
     async def on_enter(self) -> None:
@@ -65,19 +129,28 @@ async def agent(ctx: JobContext):
 
     knowledge: KnowledgeBundle = ctx.proc.userdata["knowledge"]
 
+    await ctx.connect()
+    caller_phone = await resolve_sip_caller_phone(ctx)
+
     session = AgentSession(
-        stt=inference.STT(model="deepgram/nova-3", language="multi"),
+        stt=inference.STT(model="deepgram/nova-3", language="en"),
         llm=inference.LLM(model="openai/gpt-4o"),
         tts=inference.TTS(
-            model="cartesia/sonic-3", voice="9626c31c-bec5-4cca-baa8-f8ba9e84c8bc"
+            model="cartesia/sonic-3",
+            voice="9626c31c-bec5-4cca-baa8-f8ba9e84c8bc",
         ),
-        turn_detection=MultilingualModel(),
+        turn_handling=TurnHandlingOptions(turn_detection=EnglishModel()),
         vad=ctx.proc.userdata["vad"],
+        # Speculative LLM/TTS before end-of-turn; improves latency (see LiveKit session docs).
         preemptive_generation=True,
     )
 
     await session.start(
-        agent=Assistant(knowledge=knowledge),
+        agent=Assistant(
+            knowledge=knowledge,
+            with_end_call_tool=True,
+            caller_phone=caller_phone,
+        ),
         room=ctx.room,
         room_options=room_io.RoomOptions(
             audio_input=room_io.AudioInputOptions(
@@ -90,8 +163,6 @@ async def agent(ctx: JobContext):
             ),
         ),
     )
-
-    await ctx.connect()
 
 
 if __name__ == "__main__":

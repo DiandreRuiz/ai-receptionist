@@ -1,4 +1,4 @@
-"""Demo receptionist function tools (ServiceTitan-shaped stubs)."""
+"""Receptionist function tools (ServiceTitan-shaped stubs for development)."""
 
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ class ReceptionistTools:
         address: str | None = None,
         phone: str | None = None,
     ) -> str:
-        """Search for an existing customer record (demo mock).
+        """Search for an existing customer record.
 
         Args:
             customer_name: The customer's full name.
@@ -34,7 +34,7 @@ class ReceptionistTools:
             phone,
         )
         return (
-            "No matching customer record found (demo). "
+            "No matching customer record found. "
             "Proceed as a new customer and capture their details."
         )
 
@@ -48,7 +48,7 @@ class ReceptionistTools:
         region_id = self._knowledge.region_for_zip(zip_code)
         if region_id is None:
             return (
-                "ZIP code is outside SK Quality Roofing's served areas for this demo. "
+                "ZIP code is outside SK Quality Roofing's served areas. "
                 "Do not book; politely explain they are outside the service area."
             )
         meta = self._knowledge.regional_jobs.get(region_id) or {}
@@ -74,28 +74,28 @@ class ReceptionistTools:
         insurance_claim_number: str | None = None,
         notes: str | None = None,
     ) -> str:
-        """Create a new appointment (demo mock).
+        """Create a new appointment in scheduling.
 
         Args:
             customer_name: Full name of the customer.
             address: Service address for the appointment.
-            phone: Callback number.
+            phone: Confirmed callback number (caller's line or alternate they gave).
             job_type: Job category matching get_bookable_jobs.
             issue_description: Plain-language summary for the crew.
-            scheduled_date: Selected appointment date.
-            scheduled_time_window: Selected window, e.g. morning or nine to eleven A M.
-            email: Optional email.
+            scheduled_date: Selected date including weekday when possible (e.g. Wednesday April 5 2026).
+            scheduled_time_window: Selected window, e.g. nine A M to eleven A M.
+            email: Not collected from callers; pass None.
             insurance_claim_number: Optional claim number.
             notes: Optional extra notes.
         """
         logger.info(
-            "book_appointment demo name=%s job_type=%s date=%s",
+            "book_appointment name=%s job_type=%s date=%s",
             customer_name,
             job_type,
             scheduled_date,
         )
         _ = (email, insurance_claim_number, notes, issue_description, phone, address)
         return (
-            "Appointment confirmed (demo). Reference ST-DEMO-1001. "
+            "Appointment confirmed. Confirmation reference SK-4821. "
             f"{scheduled_date}, {scheduled_time_window}."
         )

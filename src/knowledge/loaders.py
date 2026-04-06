@@ -1,4 +1,4 @@
-"""Load FAQ, regional job menus, and ZIP→region mappings from packaged assets."""
+"""Load FAQ, Cartesia TTS notes, regional job menus, and ZIP→region mappings."""
 
 from __future__ import annotations
 
@@ -21,6 +21,7 @@ _CITY_OVERLAY_ORDER: tuple[str, ...] = (
 @dataclass(frozen=True)
 class KnowledgeBundle:
     faq_markdown: str
+    cartesia_tts_best_practices_markdown: str
     regional_jobs: dict[str, dict[str, Any]]
     zip_to_region: dict[str, str]
 
@@ -105,12 +106,18 @@ def load_faq(path: Path) -> str:
     return path.read_text(encoding="utf-8").strip()
 
 
+def load_cartesia_tts_best_practices(path: Path) -> str:
+    return path.read_text(encoding="utf-8").strip()
+
+
 def load_knowledge_dir(root: Path) -> KnowledgeBundle:
     faq = load_faq(root / "faq.md")
+    cartesia = load_cartesia_tts_best_practices(root / "cartesia_tts_best_practices.md")
     regional = load_regional_jobs(root / "regional_jobs.json")
     zip_map = load_serviceable_zips(root / "serviceable_zips.json")
     return KnowledgeBundle(
         faq_markdown=faq,
+        cartesia_tts_best_practices_markdown=cartesia,
         regional_jobs=regional,
         zip_to_region=zip_map,
     )
