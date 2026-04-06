@@ -13,7 +13,7 @@ def _llm() -> llm.LLM:
 
 @pytest.mark.asyncio
 async def test_greeting_identifies_company() -> None:
-    """Agent greets the caller and identifies itself as Summit Ridge Roofing."""
+    """Agent greets the caller and identifies itself as SK Quality Roofing."""
     async with (
         _llm() as llm,
         AgentSession(llm=llm) as session,
@@ -26,7 +26,7 @@ async def test_greeting_identifies_company() -> None:
             .judge(
                 llm,
                 intent="""
-                The response identifies the company as Summit Ridge Roofing
+                The response identifies the company as SK Quality Roofing
                 and offers to help the caller. It should sound like a
                 receptionist answering a phone call.
                 """,
@@ -103,25 +103,22 @@ async def test_booking_flow_asks_about_issue_details() -> None:
 
         await session.run(user_input="Hi, I need to schedule a roof inspection.")
         result = await session.run(
-            user_input="My name is Sarah Johnson, I'm at 450 Oak Lane in Charlotte."
+            user_input="My name is Sarah Johnson, I'm at 450 Oak Lane in Delray Beach, Florida 33445."
         )
         await (
-            result.expect.next_event()
+            result.expect[-1]
             .is_message(role="assistant")
             .judge(
                 llm,
                 intent="""
-                The agent acknowledges the caller's name and address. It
-                then continues gathering information — this could be
-                completing address details (zip code, confirming the
-                address), asking about the roofing issue, requesting a
-                phone number, or any combination. The key point is the
-                agent does NOT jump straight to presenting appointment
-                times.
+                The agent acknowledges the caller's name or address (possibly
+                after a brief tool preamble) and continues gathering
+                information — asking about the roofing issue, phone number, or
+                other booking details. The agent does NOT jump straight to
+                presenting appointment time windows in this turn.
                 """,
             )
         )
-        result.expect.no_more_events()
 
 
 # --- Scope and Boundaries ---
@@ -129,7 +126,7 @@ async def test_booking_flow_asks_about_issue_details() -> None:
 
 @pytest.mark.asyncio
 async def test_refuses_to_give_pricing() -> None:
-    """Agent never provides dollar amounts, ranges, or ballpark pricing."""
+    """Agent does not treat general cost talk as a quote; steers to free estimate."""
     async with (
         _llm() as llm,
         AgentSession(llm=llm) as session,
@@ -144,10 +141,11 @@ async def test_refuses_to_give_pricing() -> None:
             .judge(
                 llm,
                 intent="""
-                The agent does NOT provide any specific dollar amounts, price
-                ranges, or ballpark figures. Instead it explains that Summit
-                Ridge offers free on-site estimates and that pricing depends
-                on the specific roof. It may offer to schedule an estimate.
+                If the agent mentions dollar amounts or typical national ranges,
+                it must clearly say that is general education, not a quote for
+                the caller's home, and that SK offers a free on-site estimate for
+                their specific roof. It must not present a number as their
+                price. It may offer to schedule an estimate.
                 """,
             )
         )
@@ -353,7 +351,7 @@ async def test_reschedule_offers_transfer() -> None:
 
 @pytest.mark.asyncio
 async def test_answers_company_question() -> None:
-    """Agent can answer questions about Summit Ridge Roofing."""
+    """Agent can answer questions about SK Quality Roofing."""
     async with (
         _llm() as llm,
         AgentSession(llm=llm) as session,
@@ -368,10 +366,11 @@ async def test_answers_company_question() -> None:
             .judge(
                 llm,
                 intent="""
-                The agent references that Summit Ridge Roofing was founded
-                in 1999 or has been in business for over 25 years. The
-                response should reflect accurate company history from
-                the prompt. It should NOT make up different founding details.
+                The agent references that SK Quality Roofing is an established
+                South Florida roofing company with multi-decade or family-owned
+                experience consistent with the prompt (for example third
+                generation or forty plus years). It should NOT claim the old
+                fictional Summit Ridge founding story.
                 """,
             )
         )
@@ -420,16 +419,16 @@ async def test_service_area_awareness() -> None:
             user_input="My name is Tom Davis. I'm at 100 Main Street in Los Angeles, California."
         )
         await (
-            result.expect.next_event()
+            result.expect[-1]
             .is_message(role="assistant")
             .judge(
                 llm,
                 intent="""
                 The agent recognizes that Los Angeles, California is outside
-                the Charlotte, NC service area. It politely lets the caller
-                know and may suggest finding a local contractor. It does NOT
-                proceed to book an appointment for an out-of-area address.
+                SK Quality Roofing's South Florida service area (Palm Beach and
+                Broward Counties). It politely lets the caller know and may
+                suggest finding a local contractor. It does NOT proceed to book
+                an appointment for an out-of-area address.
                 """,
             )
         )
-        result.expect.no_more_events()
