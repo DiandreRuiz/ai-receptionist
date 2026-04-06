@@ -1,0 +1,80 @@
+{
+  "regions": {
+    "delray_beach": {
+      "label": "Delray Beach",
+      "job_types": [
+        "Roof Installation",
+        "Roof Inspection",
+        "Roof Repair",
+        "Shingle Roof Repair and Replacement",
+        "Tile Roof Repair and Replacement"
+      ]
+    },
+    "boynton_beach": {
+      "label": "Boynton Beach",
+      "job_types": [
+        "Roof Repair",
+        "Roof Replacement",
+        "Roof Inspection",
+        "Roof Installation",
+        "Shingle Roof Repair and Replacement",
+        "Tile Roof Repair and Replacement",
+        "Metal Roof Repair and Replacement",
+        "Flat Roof Repair and Replacement",
+        "Roof Coating"
+      ]
+    },
+    "palm_beach_county": {
+      "label": "Palm Beach County",
+      "job_types": [
+        "Roof Installation",
+        "Roof Inspection",
+        "Roof Repair",
+        "Shingle Roof Repair and Replacement",
+        "Tile Roof Repair and Replacement"
+      ]
+    },
+    "broward_county": {
+      "label": "Broward County",
+      "job_types": [
+        "Roof Installation",
+        "Roof Inspection",
+        "Roof Repair",
+        "Shingle Roof Repair and Replacement",
+        "Tile Roof Repair and Replacement"
+      ]
+    },
+    "west_palm_beach": {
+      "label": "West Palm Beach",
+      "job_types": [
+        "Roof Repair",
+        "Roof Replacement",
+        "Roof Inspection",
+        "Roof Installation",
+        "Shingle Roof Repair and Replacement",
+        "Tile Roof Repair and Replacement",
+        "Metal Roof Repair and Replacement",
+        "Flat Roof Repair and Replacement",
+        "Roof Coating"
+      ]
+    },
+    "boca_raton": {
+      "label": "Boca Raton",
+      "job_types": [
+        "Roof Repair",
+        "Roof Replacement",
+        "Roof Inspection",
+        "Roof Installation",
+        "Shingle Roof Repair and Replacement",
+        "Tile Roof Repair and Replacement",
+        "Metal Roof Repair and Replacement",
+        "Flat Roof Repair and Replacement",
+        "Roof Coating"
+      ]
+    },
+    "palm_beach_gardens": {
+      "label": "Palm Beach Gardens",
+      "job_types": ["Roof Repair", "Roof Installation"]
+    }
+  }
+}

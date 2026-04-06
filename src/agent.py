@@ -9,12 +9,16 @@ from livekit.agents import (
     AgentSession,
     JobContext,
     JobProcess,
+    RunContext,
     cli,
+    function_tool,
     inference,
     room_io,
 )
 from livekit.plugins import noise_cancellation, silero
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
+
+from knowledge.loaders import KnowledgeBundle, load_knowledge_dir
 
 logger = logging.getLogger("agent")
 
@@ -23,34 +27,115 @@ load_dotenv(".env.local")
 PROMPTS_DIR = Path(__file__).parent / "prompts"
 SYSTEM_PROMPT_PATH = PROMPTS_DIR / "receptionist_system_prompt.md"
 INBOUND_GREETING_PATH = PROMPTS_DIR / "greeting.md"
+KNOWLEDGE_DIR = Path(__file__).resolve().parent / "knowledge"
 
-RECEPTIONIST_SYSTEM_PROMPT = SYSTEM_PROMPT_PATH.read_text()
 INBOUND_GREETING_INSTRUCTIONS = INBOUND_GREETING_PATH.read_text()
 
 
+def build_system_instructions(knowledge: KnowledgeBundle) -> str:
+    base = SYSTEM_PROMPT_PATH.read_text()
+    return (
+        f"{base.rstrip()}\n\n---\n\n"
+        f"# Approved FAQ (verbatim when it matches)\n\n{knowledge.faq_markdown}"
+    )
+
+
 class Assistant(Agent):
-    def __init__(self) -> None:
-        super().__init__(instructions=RECEPTIONIST_SYSTEM_PROMPT)
+    def __init__(self, knowledge: KnowledgeBundle | None = None) -> None:
+        kb = knowledge or load_knowledge_dir(KNOWLEDGE_DIR)
+        super().__init__(instructions=build_system_instructions(kb))
+        self._knowledge = kb
 
     async def on_enter(self) -> None:
         self.session.generate_reply(instructions=INBOUND_GREETING_INSTRUCTIONS)
 
-    # To add tools, use the @function_tool decorator.
-    # Here's an example that adds a simple weather tool.
-    # You also have to add `from livekit.agents import function_tool, RunContext` to the top of this file
-    # @function_tool
-    # async def lookup_weather(self, context: RunContext, location: str):
-    #     """Use this tool to look up current weather information in the given location.
-    #
-    #     If the location is not supported by the weather service, the tool will indicate this. You must tell the user the location's weather is unavailable.
-    #
-    #     Args:
-    #         location: The location to look up weather information for (e.g. city name)
-    #     """
-    #
-    #     logger.info(f"Looking up weather for {location}")
-    #
-    #     return "sunny with a temperature of 70 degrees."
+    @function_tool
+    async def lookup_customer(
+        self,
+        context: RunContext,
+        customer_name: str,
+        address: str | None = None,
+        phone: str | None = None,
+    ) -> str:
+        """Search for an existing customer record (demo mock).
+
+        Args:
+            customer_name: The customer's full name.
+            address: Service or mailing address if known.
+            phone: Phone number if known.
+        """
+        logger.info(
+            "lookup_customer name=%s address=%s phone=%s",
+            customer_name,
+            address,
+            phone,
+        )
+        return (
+            "No matching customer record found (demo). "
+            "Proceed as a new customer and capture their details."
+        )
+
+    @function_tool
+    async def get_bookable_jobs(self, context: RunContext, zip_code: str) -> str:
+        """Return bookable job types for the caller's five-digit service ZIP.
+
+        Args:
+            zip_code: U.S. ZIP code for the job location (five digits, optional ZIP+4).
+        """
+        region_id = self._knowledge.region_for_zip(zip_code)
+        if region_id is None:
+            return (
+                "ZIP code is outside SK Quality Roofing's served areas for this demo. "
+                "Do not book; politely explain they are outside the service area."
+            )
+        meta = self._knowledge.regional_jobs.get(region_id) or {}
+        label = meta.get("label") or region_id.replace("_", " ").title()
+        jobs = self._knowledge.job_types_for_region(region_id)
+        lines = ", ".join(jobs)
+        return (
+            f"Region: {label} ({region_id}). Bookable job types for this ZIP: {lines}."
+        )
+
+    @function_tool
+    async def book_appointment(
+        self,
+        context: RunContext,
+        customer_name: str,
+        address: str,
+        phone: str,
+        job_type: str,
+        issue_description: str,
+        scheduled_date: str,
+        scheduled_time_window: str,
+        email: str | None = None,
+        insurance_claim_number: str | None = None,
+        notes: str | None = None,
+    ) -> str:
+        """Create a new appointment (demo mock).
+
+        Args:
+            customer_name: Full name of the customer.
+            address: Service address for the appointment.
+            phone: Callback number.
+            job_type: Job category matching get_bookable_jobs.
+            issue_description: Plain-language summary for the crew.
+            scheduled_date: Selected appointment date.
+            scheduled_time_window: Selected window, e.g. morning or nine to eleven A M.
+            email: Optional email.
+            insurance_claim_number: Optional claim number.
+            notes: Optional extra notes.
+        """
+        logger.info(
+            "book_appointment demo name=%s job_type=%s date=%s",
+            customer_name,
+            job_type,
+            scheduled_date,
+        )
+        _ = (email, insurance_claim_number, notes, issue_description, phone, address)
+        return (
+            "Appointment confirmed (demo). Reference ST-DEMO-1001. "
+            f"{scheduled_date}, {scheduled_time_window}."
+        )
 
 
 server = AgentServer()
@@ -58,6 +143,7 @@ server = AgentServer()
 
 def prewarm(proc: JobProcess):
     proc.userdata["vad"] = silero.VAD.load()
+    proc.userdata["knowledge"] = load_knowledge_dir(KNOWLEDGE_DIR)
 
 
 server.setup_fnc = prewarm
@@ -65,55 +151,25 @@ server.setup_fnc = prewarm
 
 @server.rtc_session(agent_name="ai-receptionist-agent")
 async def agent(ctx: JobContext):
-    # Logging setup
-    # Add any other context you want in all log entries here
     ctx.log_context_fields = {
         "room": ctx.room.name,
     }
 
-    # Set up a voice AI pipeline using OpenAI, Cartesia, Deepgram, and the LiveKit turn detector
+    knowledge: KnowledgeBundle = ctx.proc.userdata["knowledge"]
+
     session = AgentSession(
-        # Speech-to-text (STT) is your agent's ears, turning the user's speech into text that the LLM can understand
-        # See all available models at https://docs.livekit.io/agents/models/stt/
         stt=inference.STT(model="deepgram/nova-3", language="multi"),
-        # A Large Language Model (LLM) is your agent's brain, processing user input and generating a response
-        # See all available models at https://docs.livekit.io/agents/models/llm/
         llm=inference.LLM(model="openai/gpt-4o"),
-        # Text-to-speech (TTS) is your agent's voice, turning the LLM's text into speech that the user can hear
-        # See all available models as well as voice selections at https://docs.livekit.io/agents/models/tts/
         tts=inference.TTS(
             model="cartesia/sonic-3", voice="9626c31c-bec5-4cca-baa8-f8ba9e84c8bc"
         ),
-        # VAD and turn detection are used to determine when the user is speaking and when the agent should respond
-        # See more at https://docs.livekit.io/agents/build/turns
         turn_detection=MultilingualModel(),
         vad=ctx.proc.userdata["vad"],
-        # allow the LLM to generate a response while waiting for the end of turn
-        # See more at https://docs.livekit.io/agents/build/audio/#preemptive-generation
         preemptive_generation=True,
     )
 
-    # To use a realtime model instead of a voice pipeline, use the following session setup instead.
-    # (Note: This is for the OpenAI Realtime API. For other providers, see https://docs.livekit.io/agents/models/realtime/))
-    # 1. Install livekit-agents[openai]
-    # 2. Set OPENAI_API_KEY in .env.local
-    # 3. Add `from livekit.plugins import openai` to the top of this file
-    # 4. Use the following session setup instead of the version above
-    # session = AgentSession(
-    #     llm=openai.realtime.RealtimeModel(voice="marin")
-    # )
-
-    # # Add a virtual avatar to the session, if desired
-    # # For other providers, see https://docs.livekit.io/agents/models/avatar/
-    # avatar = hedra.AvatarSession(
-    #   avatar_id="...",  # See https://docs.livekit.io/agents/models/avatar/plugins/hedra
-    # )
-    # # Start the avatar and wait for it to join
-    # await avatar.start(session, room=ctx.room)
-
-    # Start the session, which initializes the voice pipeline and warms up the models
     await session.start(
-        agent=Assistant(),
+        agent=Assistant(knowledge=knowledge),
         room=ctx.room,
         room_options=room_io.RoomOptions(
             audio_input=room_io.AudioInputOptions(
@@ -127,7 +183,6 @@ async def agent(ctx: JobContext):
         ),
     )
 
-    # Join the room and connect to the user
     await ctx.connect()
 
 
