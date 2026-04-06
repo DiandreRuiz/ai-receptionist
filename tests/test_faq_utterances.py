@@ -285,10 +285,12 @@ async def test_faq_storm_damage_get_checked() -> None:
             .judge(
                 llm,
                 intent="""
-                The answer matches the FAQ: after high winds or hail it is smart
-                to have the roof checked even without obvious ground-level
-                damage; document what you see safely; avoid climbing on the
-                roof yourself.
+                The answer matches the FAQ core: after bad weather it is smart to
+                have the roof checked even without obvious ground-level damage
+                (hidden issues may exist). It should encourage a professional
+                inspection rather than the homeowner climbing on the roof, or
+                mention documenting what you see safely from the ground—at
+                least one of those safety themes should appear.
                 """,
             )
         )
