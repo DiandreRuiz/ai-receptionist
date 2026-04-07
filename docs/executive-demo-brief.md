@@ -63,6 +63,7 @@ Use any phone—regular voice call, no app. After the greeting, ask a question o
 - **Real availability** — connect to your **schedule board** or **dispatch rules** so offered windows reflect **actual crew capacity**, not sample slots.
 - **High-value routing** — use captured **job type, issue, and notes** to **tag or route** leads (e.g. full replacement, large estimate) for **front-desk or manager review** in the CRM.
 - **Operational extras** as needed: **call recordings** or **transcripts** in your stack, **analytics**, **human handoff** queues, or **SMS/email** confirmations—same voice layer, richer backend.
+- **Internal dashboards** — build **operator- or leadership-facing views** with **metrics that reflect Alex’s performance** (for example call volume, booking / reschedule / cancel completion, containment vs human handoff, handling time, after-hours mix, ZIP and job-type distribution, and quality signals from transcripts or sampling) so you can **iterate on prompts, routing, and staffing** with data.
 
 **Config stays approachable:** **ZIP lists**, **regional job menus**, and **FAQ** remain **editable files**, so you can change **coverage and messaging** without rebuilding the **voice agent** from scratch.
 
