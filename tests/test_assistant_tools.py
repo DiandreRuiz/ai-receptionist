@@ -37,8 +37,21 @@ async def test_get_bookable_jobs_served_zip_plus_four(assistant: Assistant) -> N
     ctx = MagicMock()
     out = await assistant.get_bookable_jobs(ctx, "33445-1234")
     assert "Delray Beach" in out or "delray" in out.lower()
-    assert "Roof Repair" in out
-    assert "Roof Installation" in out
+    assert "Repair" in out
+    assert "Installation" in out
+    assert "Inspection" in out
+
+
+@pytest.mark.asyncio
+async def test_get_bookable_jobs_boca_lists_roof_coatings_and_metal(
+    assistant: Assistant,
+) -> None:
+    ctx = MagicMock()
+    out = await assistant.get_bookable_jobs(ctx, "33431")
+    assert "Boca Raton" in out
+    assert "Roof Coatings" in out
+    assert "Metal Roof Repair" in out
+    assert "Flat Roof Repair" in out
 
 
 @pytest.mark.asyncio
@@ -49,8 +62,8 @@ async def test_get_bookable_jobs_palm_beach_gardens_two_types(
     out = await assistant.get_bookable_jobs(ctx, "33410")
     assert "Palm Beach Gardens" in out
     assert "Roof Repair" in out
-    assert "Roof Installation" in out
-    assert "Roof Inspection" not in out
+    assert "Roof Replacement" in out
+    assert "Roof Inspections" not in out
 
 
 @pytest.mark.asyncio
@@ -69,7 +82,7 @@ async def test_book_appointment_returns_confirmation(assistant: Assistant) -> No
         customer_name="Pat Lee",
         address="10 Ocean Dr, Delray Beach FL 33483",
         phone="555-0199",
-        job_type="Roof Inspection",
+        job_type="Inspection",
         issue_description="Annual check",
         scheduled_date="Wednesday April 9 2026",
         scheduled_time_window="9 to 11 AM",
@@ -98,7 +111,9 @@ async def test_cancel_appointment_returns_confirmation(assistant: Assistant) -> 
 
 
 @pytest.mark.asyncio
-async def test_reschedule_appointment_returns_confirmation(assistant: Assistant) -> None:
+async def test_reschedule_appointment_returns_confirmation(
+    assistant: Assistant,
+) -> None:
     ctx = MagicMock()
     out = await assistant.reschedule_appointment(
         ctx,

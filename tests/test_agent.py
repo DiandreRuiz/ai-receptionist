@@ -43,10 +43,35 @@ def test_build_system_instructions_includes_session_clock() -> None:
     assert "2026-07-04T09:00:00-04:00" in text
 
 
+def test_build_system_instructions_includes_sip_caller_phone_when_provided() -> None:
+    kb = load_knowledge_dir(KNOWLEDGE_DIR)
+    text = build_system_instructions(kb, caller_phone="+15615551234")
+    assert "+15615551234" in text
+    assert "SIP" in text
+
+
+def test_build_system_instructions_omits_digits_when_no_caller_phone() -> None:
+    kb = load_knowledge_dir(KNOWLEDGE_DIR)
+    text = build_system_instructions(kb, caller_phone=None)
+    assert "do **not** have this caller's phone number on this connection" in text
+
+
 def test_receptionist_prompt_requires_consulting_faq_before_general_answers() -> None:
     text = (PROMPTS_DIR / "receptionist_system_prompt.md").read_text(encoding="utf-8")
     assert "Check the FAQ before you answer" in text
     assert "consult that appended FAQ first" in text
+
+
+def test_receptionist_prompt_requires_address_readback_before_booking_windows() -> None:
+    text = (PROMPTS_DIR / "receptionist_system_prompt.md").read_text(encoding="utf-8")
+    assert "Address read-back (required)" in text
+    assert "until the address is **confirmed**" in text
+
+
+def test_receptionist_prompt_step6_recap_includes_full_address() -> None:
+    text = (PROMPTS_DIR / "receptionist_system_prompt.md").read_text(encoding="utf-8")
+    assert "## Step 6 — Confirm" in text
+    assert "**Full service address**" in text
 
 
 def _assert_insurance_storm_response(text: str) -> None:
@@ -210,8 +235,8 @@ async def test_booking_flow_asks_zip_first_for_routing() -> None:
 
 
 @pytest.mark.asyncio
-async def test_booking_flow_asks_about_issue_details() -> None:
-    """After ZIP then name and address, the agent continues with issue or callback check—not time slots yet."""
+async def test_booking_flow_reads_back_address_before_windows() -> None:
+    """After ZIP then name and address, the agent reads back the address and seeks confirmation."""
     async with (
         _llm() as llm,
         AgentSession(llm=llm) as session,
@@ -224,20 +249,20 @@ async def test_booking_flow_asks_about_issue_details() -> None:
             user_input="My name is Sarah Johnson, I'm at 450 Oak Lane in Delray Beach, Florida 33445."
         )
         await (
-            result.expect[-1]
+            result.expect.next_event()
             .is_message(role="assistant")
             .judge(
                 llm,
                 intent="""
-                The agent acknowledges the caller's name or address (possibly
-                after a brief tool preamble) and continues gathering
-                information — asking about the roofing issue, confirming the
-                best callback number on this line, or other booking details.
-                The agent does NOT jump straight to presenting appointment time
-                windows in this turn.
+                The agent reads back key parts of the service address the caller
+                gave (for example 450, Oak Lane, Delray Beach, or 33445) and
+                asks them to confirm the address is correct (or equivalent).
+                It must NOT present three appointment time windows in this turn.
+                It must NOT finalize a booking in this turn.
                 """,
             )
         )
+        _expect_no_further_events_after_reply(result.expect)
 
 
 # --- Scope and Boundaries ---
@@ -373,11 +398,12 @@ async def test_emergency_leak_urgency() -> None:
             .judge(
                 llm,
                 intent="""
-                The agent acknowledges the emergency and expresses urgency.
-                It should convey that this is taken seriously and move quickly
-                toward getting someone out. It may mention emergency tarping
-                or prioritizing the earliest appointment. It should NOT be
-                dismissive or treat this like a routine call.
+                The agent acknowledges the emergency (sympathy or seriousness)
+                and treats it as urgent—not dismissive. It should move toward
+                help quickly: that may include asking for the service ZIP right
+                away to route coverage, offering to prioritize the earliest
+                visit, or mentioning emergency steps like tarping. Accept any
+                combination that clearly takes the leak seriously.
                 """,
             )
         )
@@ -455,7 +481,7 @@ async def test_solicitor_dismissal() -> None:
 
 @pytest.mark.asyncio
 async def test_reschedule_assistant_helps() -> None:
-    """Agent helps reschedule (collects details and/or confirms) rather than refusing."""
+    """Agent helps reschedule (demo: collect name/callback; do not demand old slot from caller)."""
     async with (
         _llm() as llm,
         AgentSession(llm=llm) as session,
@@ -470,11 +496,13 @@ async def test_reschedule_assistant_helps() -> None:
             .judge(
                 llm,
                 intent="""
-                The agent helps with rescheduling: it asks for any missing
-                details (name, best callback number, which Thursday date and
-                time window, what new day or time they prefer) OR it confirms
-                it is moving the appointment. It does NOT say it cannot
-                reschedule or that only a human can do it as the only option.
+                The agent helps with rescheduling. It should ask for missing
+                basics such as the caller's name and whether the number they
+                are on is the best callback number—or it already moves toward
+                confirming the visit. It must NOT refuse rescheduling as
+                impossible for the AI alone. It must NOT insist the caller
+                provide their current appointment date, time, or confirmation
+                code (the demo assumes the system already shows the visit).
                 """,
             )
         )
@@ -567,3 +595,180 @@ async def test_service_area_awareness() -> None:
                 """,
             )
         )
+
+
+_JULY_4_2026_NY = datetime(2026, 7, 4, 10, 0, tzinfo=ZoneInfo("America/New_York"))
+
+
+@pytest.mark.asyncio
+async def test_out_of_area_zip90210_refuses_booking() -> None:
+    """ZIP lookup fails: agent explains out of area and does not book."""
+    async with (
+        _llm() as llm,
+        AgentSession(llm=llm) as session,
+    ):
+        await session.start(Assistant())
+        await session.run(user_input="I need someone to come look at my roof.")
+        result = await session.run(
+            user_input="The property ZIP is nine zero two one zero."
+        )
+        exp = result.expect
+        exp.skip_next_event_if(type="message", role="assistant")
+        exp.next_event().is_function_call(name="get_bookable_jobs")
+        exp.next_event().is_function_call_output()
+        await (
+            exp.next_event()
+            .is_message(role="assistant")
+            .judge(
+                llm,
+                intent="""
+                The agent explains that SK Quality Roofing does not service that
+                ZIP or area (outside their South Florida coverage). It is polite
+                and does NOT offer to book an appointment or collect a full
+                service address for scheduling. It must NOT present three
+                appointment time windows.
+                """,
+            )
+        )
+        exp.no_more_events()
+
+
+@pytest.mark.asyncio
+async def test_faq_opener_does_not_demand_service_zip() -> None:
+    """A pure FAQ question should not start with demanding a service ZIP."""
+    async with (
+        _llm() as llm,
+        AgentSession(llm=llm) as session,
+    ):
+        await session.start(Assistant())
+        result = await session.run(
+            user_input="What are common signs my roof needs repair?"
+        )
+        await (
+            result.expect.next_event()
+            .is_message(role="assistant")
+            .judge(
+                llm,
+                intent="""
+                The agent answers the roofing question helpfully using FAQ-style
+                guidance. In this first reply it must NOT insist on a five-digit
+                service ZIP or demand scheduling details as the main ask (a brief
+                closing offer to schedule later is fine). It must not treat the
+                caller as if they already started a booking.
+                """,
+            )
+        )
+        _expect_no_further_events_after_reply(result.expect)
+
+
+@pytest.mark.asyncio
+async def test_full_booking_calls_book_appointment() -> None:
+    """End-to-end new booking reaches book_appointment after address confirmation."""
+    kb = load_knowledge_dir(KNOWLEDGE_DIR)
+    async with (
+        _llm() as llm,
+        AgentSession(llm=llm) as session,
+    ):
+        await session.start(Assistant(knowledge=kb, session_started_at=_JULY_4_2026_NY))
+        await session.run(user_input="I need to schedule a roof inspection.")
+        await session.run(user_input="The ZIP is three three four four five.")
+        r_addr = await session.run(
+            user_input=(
+                "My name is Morgan Lee. The address is 450 Oak Lane, "
+                "Delray Beach, Florida 33445."
+            )
+        )
+        await (
+            r_addr.expect.next_event()
+            .is_message(role="assistant")
+            .judge(
+                llm,
+                intent="""
+                The agent reads back key parts of the address (450, Oak Lane,
+                Delray, or 33445) and asks the caller to confirm before moving on.
+                It must NOT offer three appointment time windows in this turn.
+                """,
+            )
+        )
+        _expect_no_further_events_after_reply(r_addr.expect)
+        await session.run(user_input="Yes, that address is correct.")
+        await session.run(user_input="Yes, this is the best number to reach me.")
+        await session.run(
+            user_input=(
+                "It's a routine annual inspection with no active leak. "
+                "Book it as Inspection."
+            )
+        )
+        r_pick = await session.run(
+            user_input="I'll take the first appointment time you offered."
+        )
+        r_pick.expect.next_event().is_message(role="assistant")
+        r_pick.expect.next_event().is_function_call(name="book_appointment")
+        r_pick.expect.next_event().is_function_call_output()
+        await (
+            r_pick.expect.next_event()
+            .is_message(role="assistant")
+            .judge(
+                llm,
+                intent="""
+                The assistant message confirms the visit in some form (for
+                example reference number, confirmation, or recap with date and
+                address). It should reflect a completed booking step, not asking
+                unrelated trivia.
+                """,
+            )
+        )
+        r_pick.expect.no_more_events()
+
+
+@pytest.mark.asyncio
+async def test_cancel_flow_calls_cancel_appointment() -> None:
+    """Cancel path reaches cancel_appointment (demo stub)."""
+    async with (
+        _llm() as llm,
+        AgentSession(llm=llm) as session,
+    ):
+        await session.start(Assistant())
+        await session.run(user_input="I need to cancel my roofing appointment.")
+        await session.run(user_input="My name is Riley Chen.")
+        r = await session.run(user_input="Yes, this is the best number to call me.")
+        r.expect.next_event().is_message(role="assistant")
+        r.expect.next_event().is_function_call(name="cancel_appointment")
+        r.expect.next_event().is_function_call_output()
+        r.expect.next_event().is_message(role="assistant")
+        r.expect.no_more_events()
+
+
+@pytest.mark.asyncio
+async def test_reschedule_flow_calls_reschedule_appointment() -> None:
+    """Reschedule path reaches reschedule_appointment after picking a new window."""
+    kb = load_knowledge_dir(KNOWLEDGE_DIR)
+    async with (
+        _llm() as llm,
+        AgentSession(llm=llm) as session,
+    ):
+        await session.start(Assistant(knowledge=kb, session_started_at=_JULY_4_2026_NY))
+        await session.run(user_input="I need to reschedule my appointment.")
+        await session.run(user_input="Jordan Blake.")
+        r_opts = await session.run(user_input="Yes, use this phone number.")
+        await (
+            r_opts.expect.next_event()
+            .is_message(role="assistant")
+            .judge(
+                llm,
+                intent="""
+                The agent helps with rescheduling. It should refer to their roof
+                repair visit, tomorrow, or offer three new appointment time
+                windows—or several of these. It must NOT refuse to reschedule.
+                """,
+            )
+        )
+        _expect_no_further_events_after_reply(r_opts.expect)
+        r_done = await session.run(
+            user_input="I'll take the second time option you gave me."
+        )
+        r_done.expect.next_event().is_message(role="assistant")
+        r_done.expect.next_event().is_function_call(name="reschedule_appointment")
+        r_done.expect.next_event().is_function_call_output()
+        r_done.expect.next_event().is_message(role="assistant")
+        r_done.expect.no_more_events()

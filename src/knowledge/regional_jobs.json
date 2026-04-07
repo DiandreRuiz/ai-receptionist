@@ -3,11 +3,13 @@
     "delray_beach": {
       "label": "Delray Beach",
       "job_types": [
-        "Roof Installation",
-        "Roof Inspection",
-        "Roof Repair",
-        "Shingle Roof Repair and Replacement",
-        "Tile Roof Repair and Replacement"
+        "Installation",
+        "Inspection",
+        "Repair",
+        "Shingle Roof Replacement",
+        "Shingle Roof Repair",
+        "Tile Roof Replacement",
+        "Tile Roof Repair"
       ]
     },
     "boynton_beach": {
@@ -15,33 +17,41 @@
       "job_types": [
         "Roof Repair",
         "Roof Replacement",
-        "Roof Inspection",
-        "Roof Installation",
-        "Shingle Roof Repair and Replacement",
-        "Tile Roof Repair and Replacement",
-        "Metal Roof Repair and Replacement",
-        "Flat Roof Repair and Replacement",
-        "Roof Coating"
+        "Tile Roof Replacement",
+        "Tile Roof Repair",
+        "Shingle Roof Replacement",
+        "Shingle Roof Repair",
+        "Metal Roof Replacement",
+        "Metal Roof Repair",
+        "Flat Roof Replacement",
+        "Flat Roof Repair",
+        "Roof Coatings",
+        "Roof Installations",
+        "Roof Inspections"
       ]
     },
     "palm_beach_county": {
       "label": "Palm Beach County",
       "job_types": [
-        "Roof Installation",
-        "Roof Inspection",
+        "Roof Installations",
+        "Roof Inspections",
         "Roof Repair",
-        "Shingle Roof Repair and Replacement",
-        "Tile Roof Repair and Replacement"
+        "Tile Roof Replacement",
+        "Tile Roof Repair",
+        "Shingle Roof Replacement",
+        "Shingle Roof Repair"
       ]
     },
     "broward_county": {
       "label": "Broward County",
       "job_types": [
-        "Roof Installation",
-        "Roof Inspection",
+        "Roof Installations",
+        "Roof Inspections",
         "Roof Repair",
-        "Shingle Roof Repair and Replacement",
-        "Tile Roof Repair and Replacement"
+        "Tile Roof Replacement",
+        "Tile Roof Repair",
+        "Shingle Roof Replacement",
+        "Shingle Roof Repair"
       ]
     },
     "west_palm_beach": {
@@ -49,13 +59,17 @@
       "job_types": [
         "Roof Repair",
         "Roof Replacement",
-        "Roof Inspection",
-        "Roof Installation",
-        "Shingle Roof Repair and Replacement",
-        "Tile Roof Repair and Replacement",
-        "Metal Roof Repair and Replacement",
-        "Flat Roof Repair and Replacement",
-        "Roof Coating"
+        "Tile Roof Replacement",
+        "Tile Roof Repair",
+        "Shingle Roof Replacement",
+        "Shingle Roof Repair",
+        "Metal Roof Replacement",
+        "Metal Roof Repair",
+        "Flat Roof Replacement",
+        "Flat Roof Repair",
+        "Roof Coatings",
+        "Roof Installations",
+        "Roof Inspections"
       ]
     },
     "boca_raton": {
@@ -63,18 +77,22 @@
       "job_types": [
         "Roof Repair",
         "Roof Replacement",
-        "Roof Inspection",
-        "Roof Installation",
-        "Shingle Roof Repair and Replacement",
-        "Tile Roof Repair and Replacement",
-        "Metal Roof Repair and Replacement",
-        "Flat Roof Repair and Replacement",
-        "Roof Coating"
+        "Tile Roof Replacement",
+        "Tile Roof Repair",
+        "Shingle Roof Replacement",
+        "Shingle Roof Repair",
+        "Metal Roof Replacement",
+        "Metal Roof Repair",
+        "Flat Roof Replacement",
+        "Flat Roof Repair",
+        "Roof Coatings",
+        "Roof Installations",
+        "Roof Inspections"
       ]
     },
     "palm_beach_gardens": {
       "label": "Palm Beach Gardens",
-      "job_types": ["Roof Repair", "Roof Installation"]
+      "job_types": ["Roof Repair", "Roof Replacement"]
     }
   }
 }

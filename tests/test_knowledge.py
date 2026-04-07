@@ -40,7 +40,7 @@ def test_border_zip_deerfield_broward_wins() -> None:
 def test_palm_beach_gardens_two_job_types_only() -> None:
     kb = load_knowledge_dir(KNOWLEDGE_ROOT)
     jobs = kb.job_types_for_region("palm_beach_gardens")
-    assert jobs == ["Roof Repair", "Roof Installation"]
+    assert jobs == ["Roof Repair", "Roof Replacement"]
 
 
 def test_unknown_zip_not_served() -> None:
