@@ -1,64 +1,68 @@
-# SK Quality Roofing — AI receptionist (demo)
+# SK Quality Roofing — AI phone receptionist: project overview
 
-This document describes a **proof-of-concept inbound phone agent** built as an interview take-home. It shows how a residential roofing company could use AI to **answer calls, handle common questions, and guide people toward booked appointments**—without requiring a larger front desk around the clock.
+This note is a **plain-language summary** of an **inbound AI phone receptionist** for SK Quality Roofing. It is meant for owners and operators who want the business picture without technical detail.
+
+The system answers **real phone calls** with a natural voice assistant (**Alex**). It helps homeowners with **common roofing questions**, checks **whether you serve their area**, aligns **what can be scheduled** with **local rules**, and **walks callers through booking-style steps** so fewer calls die on voicemail and less front-desk time goes to repeat questions.
+
+A **PDF** version of this overview is available in the same folder: **`executive-demo-brief.pdf`**.
 
 ---
 
-## Try the demo
+## Experience it yourself
 
 **Call:** **+1 (561) 250-5794**
 
-You will have a **normal voice conversation** with the AI receptionist (Alex) from any phone. No app required.
+You will have a normal **voice conversation** with Alex from any phone. No app is required.
 
-*Technical format (for systems):* `+15612505794`
-
----
-
-## What the agent can do
-
-**Natural phone conversation.** The agent listens and speaks in real time, so callers can explain leaks, storm worries, or scheduling needs the way they would to a person.
-
-**After hours and overflow.** Software does not clock out. On a live phone line, this kind of agent can **answer when the office is closed**, on weekends, or when lines are busy—**qualifying the caller**, capturing details, and walking through **appointment-style booking steps** so your team starts Monday with structured leads instead of missed calls. *(This demo is not connected to your real calendar; it is built to show the experience and workflow.)*
-
-**Service area and “what we can book” by location.** When someone wants a visit, the agent uses the property’s **ZIP code** to check whether you serve that area and **which types of jobs are bookable there** (for example, certain regions in the demo include a wider menu—metal, flat, coatings—while others intentionally list a narrower set). That keeps promises aligned with how you actually operate in each market.
-
-**FAQ-style calls without tying up staff.** Many calls are general education: costs at a high level, storm damage, how installs work, licensing questions, and so on. The agent draws on a **curated FAQ** aligned with your messaging so those callers get consistent, approved answers and only escalate when it makes sense.
-
-**Caller ID when the network provides it.** On typical business SIP phone setups, the agent can **see the inbound number** to confirm callbacks—reducing typos and speeding up booking.
+For phone systems and CRM fields, the number in international format is **`+15612505794`**.
 
 ---
 
-## Try this (2-minute tour)
+## What it does for the business
 
-Use these prompts when you call **+1 (561) 250-5794**:
+**Sounds like a person, works at machine scale.** Callers describe leaks, storm damage, or scheduling needs in their own words; the assistant responds in real time by voice.
 
-1. **Different services by ZIP.** Say you want to schedule an inspection and give ZIP **33444** (Delray Beach in the demo data). Listen to which visit types the agent can offer. Call again (or continue) and try ZIP **33435** (Boynton Beach)—the demo allows **additional** bookable categories there (for example metal, flat, and coating work) that Delray does not list in this dataset.
-2. **Outside the service area.** Say you need someone at a property in ZIP **90210**. The agent should politely explain the property is **outside the served areas** in this demo and not book a visit.
-3. **FAQ instead of booking.** Ask something like **“What are common signs my roof needs repair?”** or **“How much does a roof replacement cost?”** You should get a short, helpful answer grounded in the approved FAQ—not a sales monologue.
-4. **Full booking path.** Walk through scheduling with an in-area ZIP. The demo **confirms** a visit with a **sample confirmation** (it does not write to a real schedule).
+**After hours and busy periods.** The line can **answer when the office is closed**, on weekends, or when staff are tied up—**qualifying** the caller, capturing **name, address, issue, and preferred times**, and moving them toward a **confirmed visit window** so your team starts the day with **organized leads** instead of **lost calls**. *(In the current build, calendar connection is illustrated but not tied to your live dispatch board.)*
 
----
+**Right service, right ZIP.** When someone wants a visit, the assistant uses the property’s **ZIP code** to confirm **coverage** and to know **which types of jobs you offer in that area** (for example, some areas in the sample data include a **broader** list—metal, flat, coatings—while others show a **tighter** menu). That keeps **promises** aligned with **how you actually operate** by market.
 
-## Demo today vs. production tomorrow
+**Frees your people from “website” calls.** Many inbound calls are **education**, not jobs: rough cost context, storm worries, how installs work, licensing, timelines. The assistant uses a **curated FAQ** aligned with your messaging so answers stay **consistent and approved**, and only **human follow-up** when it adds value.
 
-**What is simulated in this build**
-
-- **Appointment booking** returns a **demo confirmation** (placeholder reference), not a live slot in ServiceTitan or another system.
-- **Customer lookup** behaves like an empty CRM in the demo so the flow always exercises “new caller” handling.
-
-**What is already “production-shaped”**
-
-- The **steps and data fields** (name, address, phone, job type, issue summary, date and time window, optional claim number, etc.) mirror how you would hook into a **CRM / FSM such as ServiceTitan**: replace the stubs with real API calls, and the same conversation becomes operational.
-
-**Why that matters for you**
-
-- **Business knowledge** (service ZIPs, regional job menus, FAQ) lives in **editable files**, so you can change service areas and offerings **quickly** as the company grows.
-- The voice layer stays stable while you **iterate**: new policies, new markets, seasonal scripts, or deeper CRM automation.
+**Callback number accuracy.** On standard business phone (SIP) connections, the system can use the **inbound caller ID** to confirm the best number to call back—fewer wrong numbers and faster booking.
 
 ---
 
-## Closing thought
+## Suggested two-minute test drive
 
-The built world runs on **phones, schedules, and trust**. This demo is a concrete example of bringing **AI-first** tooling to that reality: **capture demand after hours**, **deflect repetitive questions**, **route by geography and service line**, and **hand off clean data** to the systems your teams already use—so you deliver value fast and keep improving without rebuilding from scratch.
+When you call **+1 (561) 250-5794**, try:
 
-*Infrastructure note:* Built on **LiveKit** enterprise-grade real-time voice, suitable for cloud deployment and telephony integration.
+1. **Different services by area.** Ask to schedule an inspection and give ZIP **33444** (Delray Beach in the sample data). Notice which visit types are offered. Call again or continue with ZIP **33435** (Boynton Beach)—the sample allows **additional** bookable categories there (such as metal, flat, and coating work) that the Delray sample list does not include.
+2. **Outside the service area.** Ask for service at ZIP **90210**. You should hear a polite explanation that the property is **outside the served areas** in this sample and that a visit will not be booked.
+3. **Questions instead of booking.** Ask something like **“What are common signs my roof needs repair?”** or **“How much does a roof replacement cost?”** You should get a **short, helpful** answer grounded in the **approved FAQ**, not a hard sell.
+4. **Full scheduling path.** Complete the flow with an in-area ZIP. The build **confirms** with a **sample confirmation reference**; it does **not** write to a live calendar or ServiceTitan yet.
+
+---
+
+## What’s in this build vs. what’s next
+
+**Simulated for now**
+
+- **Booking** returns a **sample confirmation** (placeholder reference), not a real slot in ServiceTitan or another system.
+- **Existing customer lookup** behaves like an **empty CRM** so every run exercises **new-caller** handling.
+
+**Already shaped for production**
+
+- The **data captured** (name, address, phone, job type, issue summary, date and time window, optional claim number, and notes) matches how you would **connect to a CRM / field platform such as ServiceTitan**: replace the placeholders with **real APIs**, and the **same conversation** becomes operational.
+
+**Why that matters**
+
+- **Coverage, job menus, and FAQ** live in **editable files**. When you add ZIPs, change offerings, or update messaging, you can do it **quickly** without rebuilding the whole system from scratch.
+- The **voice layer** can stay stable while you **iterate** on policy, regions, scripts, and **deeper automation** with your existing tools.
+
+---
+
+## Closing
+
+Homes and roofs still run on **phones, schedules, and trust**. This project shows how **AI-first** phone support can **capture demand after hours**, **answer repeat questions consistently**, **route by geography and service line**, and **hand off clean information** to the systems your team already uses—so you see **value quickly** and can **improve continuously** without starting over.
+
+The implementation uses **enterprise-grade real-time voice** infrastructure suitable for **cloud deployment** and **standard business phone** integration.

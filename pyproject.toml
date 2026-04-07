@@ -16,6 +16,8 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "markdown>=3.10.2",
+    "pymupdf>=1.27.2.2",
     "pytest",
     "pytest-asyncio",
     "ruff",
