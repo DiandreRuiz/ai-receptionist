@@ -77,7 +77,9 @@ def main() -> None:
     print(f"{'Session clock body (block B)':<44} {_tok(clock_body):>10,}")
     print(f"{'Inbound line — no caller ID (block A)':<44} {_tok(line_no):>10,}")
     print(f"{'Inbound line — +1 sample SIP (block A)':<44} {_tok(line_yes):>10,}")
-    print(f"{'Index + block headings + assembly dividers':<44} {assembly_overhead:>10,}")
+    print(
+        f"{'Index + block headings + assembly dividers':<44} {assembly_overhead:>10,}"
+    )
     print()
     print("Full system instructions (matches build_system_instructions):")
     print(f"  {'No caller_id':<22} {_tok(full_no):>10,} tokens")
