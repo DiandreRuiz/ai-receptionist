@@ -19,7 +19,7 @@ Use any phone—regular voice call, no app. After the greeting, ask a question o
 - **Less load on the front desk:** Alex **books**, **reschedules**, and **cancels** appointments and answers **repeat “website” questions**, so your team spends less time on **phone tag** and **intake** and more on **walk-ins, exceptions, and high-touch work**. Routine scheduling and FAQ handling move to the line without replacing judgment where you still want a human.
 - **Flag high-value jobs for review:** The same **structured data** you capture (job type, issue description, notes) can feed **workflows or your CRM** so calls that look like **full replacements, big-ticket estimates, or complex damage** are **marked for front-desk or manager follow-up**—so the **largest revenue opportunities** get a deliberate second look, not lost in the noise.
 - **After hours and busy lines:** The line can pick up **when you’re closed** or **when no one is free**, qualify the homeowner, and collect **callback number, address, issue, and time preferences** for your team. *This version is not connected to your live calendar or dispatch board.*
-- **ZIP-based booking rules:** For **new** visits, Alex only offers **job types you’ve defined for that ZIP** (in the sample data, **33444** and **33435** show **different menus** on purpose).
+- **ZIP-based booking rules:** For **new** visits, Alex only offers **job types you’ve defined for that ZIP** (in the sample data, **Delray Beach** and **Boca Raton** differ—for example **Boca Raton** lists **roof coating** and **Delray Beach** does not).
 - **Changes to existing visits:** Callers can **reschedule** or **cancel** by phone; the demo **always** completes those actions as if an appointment is on file (production would tie into your **CRM / calendar**).
 - **Website FAQs on the phone:** Education and “I read this on your site” calls are handled with an **approved FAQ** that mirrors **the topics and question-and-answer content from your website**, so callers get **full coverage** of those subjects by voice—without staff repeating the same explanations.
 - **Callback accuracy:** On standard **business phone (SIP)** service, the system can use **incoming caller ID** to double-check the best number to reach them.
@@ -32,10 +32,10 @@ Use any phone—regular voice call, no app. After the greeting, ask a question o
 
    - **Delray — ZIP 33444**  
      `123 East Atlantic Ave, Delray Beach, FL 33444`
-   - **Boynton — ZIP 33435**  
-     `200 N Federal Hwy, Boynton Beach, FL 33435`
+   - **Boca Raton — ZIP 33431**  
+     `150 E Palmetto Park Rd, Boca Raton, FL 33431`
 
-   Notice **which visit types** Alex can book in each—the Boynton sample includes **more categories** (metal, flat, coating, etc.) than Delray.
+   Notice that **Boca Raton** includes **roof coating** as a bookable type in this demo, while **Delray Beach** does **not**—the menus are **ZIP-specific**.
 
 2. **Out of area**
 
