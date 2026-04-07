@@ -28,7 +28,7 @@ Use any phone—regular voice call, no app. After the greeting, ask a question o
 
 1. **Compare ZIPs**
 
-   Say you want an inspection. Use one call per address (or compare back-to-back):
+   Say you want an estimate for a job. Use one call per address (or compare back-to-back):
 
    - **Delray — ZIP 33444**  
      `123 East Atlantic Ave, Delray Beach, FL 33444`
