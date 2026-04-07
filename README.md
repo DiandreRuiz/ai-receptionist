@@ -59,12 +59,14 @@ Use any phone—regular voice call, no app. After the greeting, ask a question o
 
 ## Bottom line
 
-- **After-hours coverage** — fewer calls lost to voicemail when you’re closed or everyone is on another line.
-- **Consistent answers** — repeat education topics get the **same approved messaging** every time.
-- **Tight control over geography and what you book** — you define **which ZIPs you serve** and **which visit types** are offered in each area.
-- **Structured handoff** — details are captured in a form that maps cleanly to the **CRM and field tools** your team already uses.
+- **After hours and overflow** — the line can answer **when you’re closed** or **when staff are tied up**, capture **who, where, what’s wrong, and preferred times**, and cut **voicemail abandonment**.
+- **Less load on the front desk** — **book**, **reschedule**, and **cancel** on the phone plus **repeat FAQ** handling, so your team spends less time on **phone tag** and **intake** and more on **exceptions and high-touch** work.
+- **ZIP-accurate offers** — only **job types you allow per ZIP** (demo: e.g. **roof coating** in **Boca Raton**, not in **Delray**), so promises match **how you operate by market**.
+- **Website-aligned answers** — callers get **approved FAQ coverage** by voice for the **same topics** they’d read on your site—**consistent messaging** without staff repeating long explanations.
+- **High-value jobs surfaced** — **structured fields** (job type, issue, notes) can feed **CRM or workflows** so **big replacements, heavy damage, or large estimates** are **flagged for front-desk or manager follow-up**.
+- **Accurate callbacks and CRM-ready data** — **SIP caller ID** helps confirm the **best number**; captured details **map cleanly** to **ServiceTitan-style** systems.
 
-Together, that means you can **adjust coverage and offers without rebuilding the voice system from scratch** as the business changes.
+Together, that means you can **adjust ZIPs, menus, and FAQ in simple files** and **iterate** without rebuilding the **voice layer** from scratch as the business changes.
 
 The assistant runs on **enterprise-grade real-time voice**, suitable for **cloud** deployment and **standard business phone** connections.
 
