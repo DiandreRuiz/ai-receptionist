@@ -107,32 +107,29 @@ class ReceptionistTools:
         context: RunContext,
         customer_name: str,
         phone: str,
+        scheduled_date: str,
+        scheduled_time_window: str,
         confirmation_reference: str | None = None,
-        scheduled_date: str | None = None,
-        scheduled_time_window: str | None = None,
         reason: str | None = None,
     ) -> str:
-        """Cancel an existing scheduled visit (stub: always succeeds as if a job exists).
+        """Cancel an existing scheduled visit (stub: always succeeds).
 
-        Args:
-            customer_name: Full name on the appointment.
-            phone: Confirmed callback number for this caller.
-            confirmation_reference: Optional reference the caller was given (e.g. SK-4821).
-            scheduled_date: When the visit was scheduled, if the caller gave it.
-            scheduled_time_window: Original time window, if known.
-            reason: Optional plain-language reason for canceling.
+        Demo: the assistant always passes the fixed "tomorrow" slot it stated aloud
+        (roof repair, nine A M to eleven A M)—never values collected from the caller.
         """
         logger.info(
-            "cancel_appointment name=%s phone=%s ref=%s",
+            "cancel_appointment name=%s phone=%s ref=%s date=%s",
             customer_name,
             phone,
             confirmation_reference,
+            scheduled_date,
         )
         _ = (reason, scheduled_date, scheduled_time_window)
         ref = confirmation_reference or "on file"
         return (
             "Cancellation confirmed. Reference SK-C9088. "
-            f"The appointment for {customer_name} has been removed from the schedule "
+            f"The roof repair visit for {customer_name} on {scheduled_date}, "
+            f"{scheduled_time_window}, has been removed from the schedule "
             f"(confirmation {ref})."
         )
 
@@ -152,16 +149,8 @@ class ReceptionistTools:
     ) -> str:
         """Reschedule an existing visit to a new date and window (stub: always succeeds).
 
-        Args:
-            customer_name: Full name on the appointment.
-            phone: Confirmed callback number for this caller.
-            original_scheduled_date: Current appointment date (weekday + calendar date when possible).
-            original_time_window: Current time window.
-            new_scheduled_date: New date (weekday + calendar date when possible).
-            new_time_window: New time window.
-            confirmation_reference: Optional reference the caller was given (e.g. SK-4821).
-            address: Service address if needed for clarity; optional.
-            notes: Optional notes for the crew or scheduler.
+        Demo: original_* must always be the assistant's fixed "tomorrow" roof-repair
+        slot (nine A M to eleven A M) that was stated aloud—not caller-supplied times.
         """
         logger.info(
             "reschedule_appointment name=%s orig=%s new=%s",
@@ -172,6 +161,6 @@ class ReceptionistTools:
         _ = (address, notes, confirmation_reference)
         return (
             "Reschedule confirmed. Reference SK-R7703. "
-            f"Moved from {original_scheduled_date}, {original_time_window} "
+            f"Roof repair moved from {original_scheduled_date}, {original_time_window} "
             f"to {new_scheduled_date}, {new_time_window}."
         )

@@ -28,7 +28,7 @@ Use any phone—regular voice call, no app. After the greeting, ask a question o
 2. **Out of area:** Use **90210**. You should hear a **polite “outside our area”** message and **no booking**.
 3. **FAQ only:** Ask *“What are common signs my roof needs repair?”* or *“How much does a roof replacement cost?”* You should get a **short, helpful** reply—not a sales script.
 4. **Full booking:** Finish the flow with an in-area ZIP. You’ll get a **sample confirmation code** only; nothing is written to **ServiceTitan** or a **live calendar** in this build.
-5. **Reschedule or cancel:** Say you need to **move** or **cancel** an existing visit and give a name plus rough dates. The demo **always** returns a **sample reschedule or cancel confirmation** (no real calendar lookup).
+5. **Reschedule or cancel:** Give your **name** and confirm **callback number**—Alex **does not** ask for your old appointment time; the demo **always** shows **tomorrow, nine A M to eleven A M, roof repair**, then **cancels** or offers **three new times** to **reschedule** (sample confirmations only).
 
 ## This build vs. next step
 

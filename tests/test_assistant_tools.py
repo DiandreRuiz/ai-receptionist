@@ -86,13 +86,14 @@ async def test_cancel_appointment_returns_confirmation(assistant: Assistant) -> 
         ctx,
         customer_name="Pat Lee",
         phone="555-0199",
-        confirmation_reference="SK-4821",
         scheduled_date="Wednesday April 9 2026",
         scheduled_time_window="9 to 11 AM",
+        confirmation_reference="SK-4821",
         reason="Travel conflict",
     )
     assert "SK-C9088" in out
     assert "Pat Lee" in out
+    assert "roof repair" in out.lower()
     assert "removed" in out.lower() or "cancel" in out.lower()
 
 
@@ -110,5 +111,6 @@ async def test_reschedule_appointment_returns_confirmation(assistant: Assistant)
         confirmation_reference="SK-4821",
     )
     assert "SK-R7703" in out
+    assert "roof repair" in out.lower()
     assert "April 9" in out or "April" in out
-    assert "April 11" in out or "Moved" in out
+    assert "April 11" in out or "moved" in out.lower()
