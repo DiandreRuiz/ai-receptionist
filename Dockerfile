@@ -10,6 +10,11 @@ FROM ghcr.io/astral-sh/uv:python${PYTHON_VERSION}-bookworm-slim AS base
 # the application crashes without emitting any logs due to buffering.
 ENV PYTHONUNBUFFERED=1
 
+# Hugging Face / turn-detector weights must live under /app so they are included when
+# we COPY --from=build /app. (Default root cache /root/.cache is NOT copied to the
+# production stage — that caused missing languages.json / model_q8.onnx on Cloud.)
+ENV HF_HOME=/app/.cache/huggingface
+
 # --- Build stage ---
 # Install dependencies, build native extensions, and prepare the application
 FROM base AS build
@@ -47,7 +52,7 @@ COPY . .
 # Pre-download any ML models or files the agent needs
 # This ensures the container is ready to run immediately without downloading
 # dependencies at runtime, which improves startup time and reliability
-RUN uv run "src/agent.py" download-files
+RUN mkdir -p "${HF_HOME}" && uv run "src/agent.py" download-files
 
 # --- Production stage ---
 # Build tools (gcc, g++, python3-dev) are not included in the final image

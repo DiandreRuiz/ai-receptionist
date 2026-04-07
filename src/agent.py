@@ -1,4 +1,3 @@
-import asyncio
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -74,22 +73,6 @@ def _sip_caller_phone_from_room(room: rtc.Room) -> str | None:
     return None
 
 
-async def resolve_sip_caller_phone(ctx: JobContext) -> str | None:
-    """SIP caller ID when available (see LiveKit `sip.phoneNumber` on SIP participants)."""
-    found = _sip_caller_phone_from_room(ctx.room)
-    if found or ctx.is_fake_job():
-        return found
-    try:
-        p = await asyncio.wait_for(
-            ctx.wait_for_participant(kind=rtc.ParticipantKind.PARTICIPANT_KIND_SIP),
-            timeout=5.0,
-        )
-    except TimeoutError:
-        return None
-    raw = p.attributes.get("sip.phoneNumber")
-    return str(raw).strip() if raw else None
-
-
 class Assistant(ReceptionistTools, Agent):
     def __init__(
         self,
@@ -129,8 +112,8 @@ async def agent(ctx: JobContext):
 
     knowledge: KnowledgeBundle = ctx.proc.userdata["knowledge"]
 
-    await ctx.connect()
-    caller_phone = await resolve_sip_caller_phone(ctx)
+    # SIP is usually already on ctx.room when the job runs; if not, prompts handle missing ID.
+    caller_phone = _sip_caller_phone_from_room(ctx.room)
 
     session = AgentSession(
         stt=inference.STT(model="deepgram/nova-3", language="en"),
@@ -163,6 +146,7 @@ async def agent(ctx: JobContext):
             ),
         ),
     )
+    await ctx.connect()
 
 
 if __name__ == "__main__":
