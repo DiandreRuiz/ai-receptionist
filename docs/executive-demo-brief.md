@@ -4,7 +4,7 @@ Written for **owners and operators**—what this is, why it matters, and how to 
 
 **Alex** is the voice assistant on your inbound line. Callers can ask **roofing questions**, get a **yes/no on service area** from the property **ZIP**, hear only **job types you offer in that area**, and go through **scheduling steps** (contact details, address, what’s wrong, preferred times). The goal is fewer calls lost to voicemail and less time spent answering the same general questions at the front desk.
 
-A matching **PDF** is in this folder: **`executive-demo-brief.pdf`**.
+A matching **PDF** is in this folder: **[executive-demo-brief.pdf](executive-demo-brief.pdf)**.
 
 ## Try it
 
