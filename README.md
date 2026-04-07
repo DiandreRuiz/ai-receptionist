@@ -6,7 +6,7 @@
 
 Written for **owners and operators**—what this is, why it matters, and how to try it.
 
-**Alex** is the voice assistant on your inbound line. Callers can ask **roofing questions**, get a **yes/no on service area** from the property **ZIP**, hear only **job types you offer in that area**, and go through **scheduling steps** (contact details, address, what’s wrong, preferred times). The goal is fewer calls lost to voicemail and less time spent answering the same general questions at the front desk.
+**Alex** is the voice assistant on your inbound line. Callers can ask **roofing questions**, get a **yes/no on service area** from the property **ZIP**, hear only **job types you offer in that area**, and go through **scheduling steps** (contact details, address, what’s wrong, preferred times). They can also talk through **the same topics and FAQs your website covers**—installs, repairs, materials, storm and insurance questions, timelines, licensing, and the rest—in plain conversation, with **approved answers** that match your messaging. The goal is fewer calls lost to voicemail and less time spent answering the same general questions at the front desk.
 
 A matching **PDF** is in the repo: **[docs/executive-demo-brief.pdf](docs/executive-demo-brief.pdf)**.
 
@@ -22,7 +22,7 @@ Use any phone—regular voice call, no app. After the greeting, ask a question o
 
 - **After hours and busy lines:** The line can pick up **when you’re closed** or **when no one is free**, qualify the homeowner, and collect **callback number, address, issue, and time preferences** for your team. *This version is not connected to your live calendar or dispatch board.*
 - **ZIP-based booking rules:** Alex only offers **visit types you’ve defined for that ZIP** (in the sample data, **33444** and **33435** show **different menus** on purpose).
-- **FAQ-heavy calls:** Typical education topics—**ballpark cost context**, **storm damage**, **how installs work**, **licensing**—pull from a **curated FAQ** so answers stay aligned with your messaging.
+- **Website FAQs on the phone:** Education and “I read this on your site” calls are handled with an **approved FAQ** that mirrors **the topics and question-and-answer content from your website**, so callers get **full coverage** of those subjects by voice—without staff repeating the same explanations.
 - **Callback accuracy:** On standard **business phone (SIP)** service, the system can use **incoming caller ID** to double-check the best number to reach them.
 
 ## Two-minute test drive
