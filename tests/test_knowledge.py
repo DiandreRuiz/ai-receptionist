@@ -53,3 +53,26 @@ def test_cartesia_tts_best_practices_packaged() -> None:
     text = kb.cartesia_tts_best_practices_markdown
     assert "Sonic-3" in text
     assert "MM/DD/YYYY" in text
+
+
+def test_faq_includes_topic_group_sections() -> None:
+    kb = load_knowledge_dir(KNOWLEDGE_ROOT)
+    text = kb.faq_markdown
+    assert "# Roof Installation" in text
+    assert "# Roof Repair" in text
+    assert "# Roof Inspection" in text
+    assert "# Roof Replacement" in text
+    assert "# Metal Roof Installation & Repair" in text
+    assert "# Flat Roof Installation & Repair" in text
+
+
+def test_faq_includes_delray_office_facts_no_phone() -> None:
+    kb = load_knowledge_dir(KNOWLEDGE_ROOT)
+    text = kb.faq_markdown
+    assert "772 SW 17th Avenue" in text
+    assert "Delray Beach, FL 33444" in text
+    assert "Open 24 hours" in text
+    assert "CCC1336888" in text
+    assert "CCC1329590" in text
+    assert "783-5251" not in text
+    assert "(561)" not in text

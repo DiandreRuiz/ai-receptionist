@@ -372,3 +372,107 @@ async def test_faq_metal_roofing_benefits() -> None:
             )
         )
         result.expect.no_more_events()
+
+
+@pytest.mark.asyncio
+async def test_faq_florida_roof_installation_typical_duration() -> None:
+    async with (
+        _llm() as llm,
+        AgentSession(llm=llm) as session,
+    ):
+        await session.start(Assistant())
+        result = await session.run(
+            user_input="If I'm in Florida, roughly how many days does a normal house roof installation usually take?"
+        )
+        await (
+            result.expect.next_event()
+            .is_message(role="assistant")
+            .judge(
+                llm,
+                intent="""
+                The answer reflects the FAQ: often on the order of about two to
+                five days for a typical home, with weather and extra repairs as
+                factors that can extend it. It should stay general—not a promise
+                for this caller's job.
+                """,
+            )
+        )
+        result.expect.no_more_events()
+
+
+@pytest.mark.asyncio
+async def test_faq_flat_roof_drainage_focus() -> None:
+    async with (
+        _llm() as llm,
+        AgentSession(llm=llm) as session,
+    ):
+        await session.start(Assistant())
+        result = await session.run(
+            user_input="What is the big thing to get right with a flat roof in Florida when it rains a lot?"
+        )
+        await (
+            result.expect.next_event()
+            .is_message(role="assistant")
+            .judge(
+                llm,
+                intent="""
+                The answer matches the FAQ theme: drainage is critical—water does
+                not shed like a steep roof; keeping drains, scuppers, or gutters
+                clear and proper installation matters; ponding or failed seams
+                increase risk. It should not guarantee the caller's roof type.
+                """,
+            )
+        )
+        result.expect.no_more_events()
+
+
+@pytest.mark.asyncio
+async def test_faq_metal_roof_noise_and_lightning_myths() -> None:
+    async with (
+        _llm() as llm,
+        AgentSession(llm=llm) as session,
+    ):
+        await session.start(Assistant())
+        result = await session.run(
+            user_input="I'm worried metal roofing will be super loud in the rain and attract lightning—is that true?"
+        )
+        await (
+            result.expect.next_event()
+            .is_message(role="assistant")
+            .judge(
+                llm,
+                intent="""
+                The answer should debunk the lightning myth: metal does not
+                attract lightning. For rain noise, it should reflect the FAQ idea
+                that with proper decking and insulation or underlayment, modern
+                metal roofs are usually not noticeably louder than other roofs.
+                """,
+            )
+        )
+        result.expect.no_more_events()
+
+
+@pytest.mark.asyncio
+async def test_faq_delray_office_address_hours_no_phone() -> None:
+    async with (
+        _llm() as llm,
+        AgentSession(llm=llm) as session,
+    ):
+        await session.start(Assistant())
+        result = await session.run(
+            user_input="What's the address of your Delray Beach office and what are your hours there?"
+        )
+        await (
+            result.expect.next_event()
+            .is_message(role="assistant")
+            .judge(
+                llm,
+                intent="""
+                The answer includes the FAQ facts: roughly 772 SW 17th Avenue
+                (or Southwest Seventeenth Avenue), Delray Beach, Florida 33444,
+                and that the office is open twenty-four hours or around the
+                clock. It must NOT give a telephone number (none is in the FAQ).
+                """,
+            )
+        )
+        result.expect.no_more_events()

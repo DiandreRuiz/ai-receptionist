@@ -1,4 +1,6 @@
+from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from dotenv import load_dotenv
 from livekit import rtc
@@ -27,13 +29,35 @@ SYSTEM_PROMPT_PATH = PROMPTS_DIR / "receptionist_system_prompt.md"
 INBOUND_GREETING_PATH = PROMPTS_DIR / "greeting.md"
 KNOWLEDGE_DIR = Path(__file__).resolve().parent / "knowledge"
 
+# Business-local “today” for scheduling copy (South Florida).
+SESSION_CLOCK_TZ = ZoneInfo("America/New_York")
+
 INBOUND_GREETING_INSTRUCTIONS = INBOUND_GREETING_PATH.read_text()
+
+
+def _session_clock_context(when: datetime) -> str:
+    """Human + ISO lines for the LLM; fixed at job start."""
+    local = (
+        when.astimezone(SESSION_CLOCK_TZ)
+        if when.tzinfo
+        else when.replace(tzinfo=SESSION_CLOCK_TZ)
+    )
+    spoken = local.strftime("%A, %B %d, %Y at %I:%M %p %Z")
+    return (
+        "# Session clock (reference for scheduling)\n\n"
+        f"**Local time when this session started** ({SESSION_CLOCK_TZ.key}): **{spoken}** "
+        f"(ISO: {local.isoformat(timespec='seconds')}).\n\n"
+        "Treat this as **today** when proposing appointment dates, interpreting phrases like "
+        "**“tomorrow”** or **“next week,”** and staying consistent within the call. "
+        "This timestamp is from session start, not updated every minute."
+    )
 
 
 def build_system_instructions(
     knowledge: KnowledgeBundle,
     *,
     caller_phone: str | None = None,
+    session_started_at: datetime | None = None,
 ) -> str:
     base = SYSTEM_PROMPT_PATH.read_text()
     if caller_phone:
@@ -52,9 +76,13 @@ def build_system_instructions(
             "Do **not** say you can see their number or read digits back unless they spoke a number. "
             "Still ask **“Is this the best number to contact you on?”** as in your booking rules."
         )
+    clock = session_started_at or datetime.now(SESSION_CLOCK_TZ)
+    clock_ctx = _session_clock_context(clock)
     return (
         f"{base.rstrip()}\n\n---\n\n"
         f"{line_ctx}\n\n"
+        f"---\n\n"
+        f"{clock_ctx}\n\n"
         f"---\n\n"
         f"# Approved FAQ (verbatim when it matches)\n\n{knowledge.faq_markdown}\n\n"
         f"---\n\n"
@@ -80,11 +108,16 @@ class Assistant(ReceptionistTools, Agent):
         *,
         with_end_call_tool: bool = False,
         caller_phone: str | None = None,
+        session_started_at: datetime | None = None,
     ) -> None:
         kb = knowledge or load_knowledge_dir(KNOWLEDGE_DIR)
         hangup_tools = [EndCallTool()] if with_end_call_tool else []
         super().__init__(
-            instructions=build_system_instructions(kb, caller_phone=caller_phone),
+            instructions=build_system_instructions(
+                kb,
+                caller_phone=caller_phone,
+                session_started_at=session_started_at,
+            ),
             tools=hangup_tools,
         )
         self._knowledge = kb

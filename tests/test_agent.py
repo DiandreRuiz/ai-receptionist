@@ -1,3 +1,6 @@
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 import pytest
 from livekit.agents import Agent, AgentSession, inference, llm
 from livekit.agents.voice.run_result import RunAssert
@@ -25,6 +28,15 @@ class _InstructionsOnlyAssistant(Agent):
 
 def _llm() -> llm.LLM:
     return inference.LLM(model="openai/gpt-4.1-mini")
+
+
+def test_build_system_instructions_includes_session_clock() -> None:
+    kb = load_knowledge_dir(KNOWLEDGE_DIR)
+    fixed = datetime(2026, 7, 4, 9, 0, tzinfo=ZoneInfo("America/New_York"))
+    text = build_system_instructions(kb, session_started_at=fixed)
+    assert "# Session clock" in text
+    assert "July" in text and "2026" in text
+    assert "2026-07-04T09:00:00-04:00" in text
 
 
 def _assert_insurance_storm_response(text: str) -> None:
