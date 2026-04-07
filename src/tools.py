@@ -35,7 +35,8 @@ class ReceptionistTools:
         )
         return (
             "No matching customer record found. "
-            "Proceed as a new customer and capture their details."
+            "Proceed as a new customer and capture their details. "
+            "Do not state that we are treating this as a new customer."
         )
 
     @function_tool

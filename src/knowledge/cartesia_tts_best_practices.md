@@ -11,6 +11,14 @@ Use these practices for **text that will be synthesized** by **Sonic-3** (assist
 
 - Prefer dates in **MM/DD/YYYY** form (example: **04/20/2023**).
 
+## Dates plus time windows (same utterance)
+
+Callers need to hear **which day** and **which hours** as distinct ideas. If TTS runs them together, add structure:
+
+- After the **full calendar date**, use a **comma**, then a **from … to …** or **between … and …** phrase for the window (example: **Wednesday, April 5, from 9:00 AM to 11:00 AM**).
+- **Do not** place **AM**/**PM** immediately after the weekday or month without the **day of month** and a break (avoid **Wednesday 9:00 AM** when you mean a specific calendar day).
+- If synthesis still rushes the handoff from date to time, add a **pause** between the date clause and **from** using **hyphens** or **break tags** (see **Pauses** below)—for example, a hyphen after the date, then **from 9:00 AM to 11:00 AM**.
+
 ## Times
 
 - Add a **space** between the time and **AM** or **PM**.
