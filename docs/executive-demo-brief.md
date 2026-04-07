@@ -1,42 +1,39 @@
-# SK Quality Roofing — AI phone receptionist
+# SK Quality Roofing — AI phone receptionist: project overview
 
-## Project overview
+Written for **owners and operators**—what this is, why it matters, and how to try it, in plain English.
 
-This one-pager is for **owners and operators**: what the system does, why it matters, and how to try it—without technical jargon.
+**Alex** is the voice assistant on your inbound line. Callers can ask **roofing questions**, get a **yes/no on service area** from the property **ZIP**, hear only **job types you offer in that area**, and go through **scheduling steps** (contact details, address, what’s wrong, preferred times). The goal is fewer calls lost to voicemail and less time spent answering the same general questions at the front desk.
 
-**Alex** answers **inbound phone calls** in natural speech. It handles **common roofing questions**, checks **whether the property is in your service area** (by **ZIP code**), offers only **job types you allow for that area**, and **walks callers through scheduling** (name, address, issue, preferred times). That reduces **voicemail abandonment** and keeps **repeat “website questions”** off your front desk.
-
-A **PDF** copy of this note is saved alongside it as **`executive-demo-brief.pdf`**.
+A matching **PDF** is in this folder: **`executive-demo-brief.pdf`**.
 
 ## Try it
 
 > **Phone:** **+1 (561) 250-5794**
 >
-> **Systems / CRM:** `+15612505794`
+> **Dialing / CRM:** `+15612505794`
 
-Call from any phone—normal voice conversation; no app. You should hear a short greeting, then you can ask questions or say you want to schedule.
+Use any phone—regular voice call, no app. After the greeting, ask a question or say you’d like to schedule.
 
-## What callers get
+## Business value
 
-- **Human-style conversation:** Callers explain leaks, storms, or scheduling in their own words; Alex responds in real time by voice.
-- **After hours and overflow:** The same line can **answer when the office is closed** or when everyone is on another call, **capture lead details**, and **offer appointment-style windows** so the crew starts with **structured follow-ups** instead of missed calls. *(This build does not connect to your live dispatch calendar.)*
-- **ZIP-based routing:** Service area and **which visit types are bookable** come from **rules you maintain** (in the sample, **33444** vs **33435** illustrates **different menus** by area).
-- **FAQ handling:** Education calls—rough cost context, storm damage, how installs work, licensing—draw on a **curated FAQ** so messaging stays **consistent** with what you approve.
-- **Caller ID (typical business phone):** On **SIP** lines, the inbound number can be used to **confirm the best callback number**.
+- **After hours and busy lines:** The line can pick up **when you’re closed** or **when no one is free**, qualify the homeowner, and collect **callback number, address, issue, and time preferences** for your team. *This version is not connected to your live calendar or dispatch board.*
+- **ZIP-based booking rules:** Alex only offers **visit types you’ve defined for that ZIP** (in the sample data, **33444** and **33435** show **different menus** on purpose).
+- **FAQ-heavy calls:** Typical education topics—**ballpark cost context**, **storm damage**, **how installs work**, **licensing**—pull from a **curated FAQ** so answers stay aligned with your messaging.
+- **Callback accuracy:** On standard **business phone (SIP)** service, the system can use **incoming caller ID** to double-check the best number to reach them.
 
-## Try this (about two minutes)
+## Two-minute test drive
 
-1. **Different menus by ZIP:** Say you want an inspection. Try **33444** (Delray Beach in the sample), then **33435** (Boynton Beach). Listen for **which job types** Alex can book in each—Boynton’s sample list includes **more categories** (e.g. metal, flat, coating) than Delray’s.
-2. **Out of area:** Give **90210**. Expect a **polite decline**; no booking.
-3. **FAQ only:** Ask **“What are common signs my roof needs repair?”** or **“How much does a roof replacement cost?”**—short, informative answers, not a hard pitch.
-4. **Full booking:** Complete the flow with an in-area ZIP. You get a **sample confirmation reference** only—**not** a real ServiceTitan or calendar entry **yet**.
+1. **Compare ZIPs:** Say you want an inspection. Try **33444** (Delray in the sample), then **33435** (Boynton). Notice **which types of visits** Alex can book in each—the Boynton sample includes **more categories** (such as metal, flat, and coating work) than the Delray sample.
+2. **Out of area:** Use **90210**. You should hear a **polite “outside our area”** message and **no booking**.
+3. **FAQ only:** Ask *“What are common signs my roof needs repair?”* or *“How much does a roof replacement cost?”* You should get a **short, helpful** reply—not a sales script.
+4. **Full booking:** Finish the flow with an in-area ZIP. You’ll get a **sample confirmation code** only; nothing is written to **ServiceTitan** or a **live calendar** in this build.
 
 ## This build vs. next step
 
-**In this build:** **Booking** returns a **placeholder confirmation**; **customer lookup** is a **stub** so every call exercises the **new-caller** path.
+**Right now,** booking ends in a **placeholder confirmation**, and **customer lookup** always behaves like a **brand-new caller** so the demo always runs the full intake.
 
-**Ready for production:** The **information collected** matches what you’d send to a **CRM or field platform** (e.g. **ServiceTitan**): swap stubs for **real APIs**, and the same voice flow goes live. **ZIP lists, regional job menus, and FAQ** stay in **editable files** so you can **adjust coverage and messaging quickly** without rewriting the whole system.
+**When you’re ready to go live,** the **same questions and data fields** map cleanly to a **CRM or field platform** (for example **ServiceTitan**): replace the placeholders with **real integrations**. **ZIP lists, regional job menus, and FAQ** live in **simple files** you can update as coverage and offerings change—without rebuilding the voice system from scratch.
 
-## Summary
+## Bottom line
 
-**Capture demand after hours**, **answer repeat questions consistently**, **enforce geography and service rules**, and **hand off clean data** to the tools your team already uses. Built on **enterprise-grade real-time voice** for **cloud** deployment and **standard business telephony**.
+You get **after-hours coverage**, **consistent answers** on repeat topics, **tight control over geography and what you book**, and **structured handoff** to the tools your team already runs on—without starting over every time you refine the business. The runtime uses **enterprise-grade real-time voice**, suitable for **cloud** hosting and **standard business phone** connections.
