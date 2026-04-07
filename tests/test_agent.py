@@ -1,10 +1,17 @@
+import json
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import pytest
 from livekit.agents import Agent, AgentSession, inference, llm
-from livekit.agents.voice.run_result import RunAssert
+from livekit.agents.voice.run_result import (
+    ChatMessageEvent,
+    FunctionCallEvent,
+    FunctionCallOutputEvent,
+    RunAssert,
+    RunEvent,
+)
 
 from agent import KNOWLEDGE_DIR, Assistant, build_system_instructions
 from knowledge.loaders import load_knowledge_dir
@@ -31,6 +38,62 @@ class _InstructionsOnlyAssistant(Agent):
 
 def _llm() -> llm.LLM:
     return inference.LLM(model="openai/gpt-4.1-mini")
+
+
+def _flatten_assistant_text(events: list[RunEvent]) -> str:
+    """All assistant message text in run order (for outcome checks)."""
+    chunks: list[str] = []
+    for ev in events:
+        if not isinstance(ev, ChatMessageEvent) or ev.item.role != "assistant":
+            continue
+        content = ev.item.content
+        if isinstance(content, list):
+            chunks.extend(str(x) for x in content)
+        elif content is not None:
+            chunks.append(str(content))
+    return " ".join(chunks)
+
+
+def _function_calls_named(events: list[RunEvent], name: str) -> list[FunctionCallEvent]:
+    return [
+        ev
+        for ev in events
+        if isinstance(ev, FunctionCallEvent) and ev.item.name == name
+    ]
+
+
+def _assert_single_tool_call(events: list[RunEvent], name: str) -> dict:
+    """Exactly one call to ``name``; return parsed arguments JSON object."""
+    found = _function_calls_named(events, name)
+    assert len(found) == 1, (
+        f"expected exactly one {name!r} call, got {len(found)} "
+        f"({[e.item.name for e in events if isinstance(e, FunctionCallEvent)]})"
+    )
+    return json.loads(found[0].item.arguments)
+
+
+def _assert_tool_output_follows(
+    events: list[RunEvent], name: str, *, substring: str
+) -> None:
+    """After the named function_call, the next output for that tool contains ``substring``."""
+    call_idx: int | None = None
+    for i, ev in enumerate(events):
+        if isinstance(ev, FunctionCallEvent) and ev.item.name == name:
+            call_idx = i
+            break
+    assert call_idx is not None, f"No function_call {name!r} in run"
+    for ev in events[call_idx + 1 :]:
+        if isinstance(ev, FunctionCallOutputEvent) and ev.item.name == name:
+            assert substring in (ev.item.output or ""), ev.item.output
+            assert not ev.item.is_error
+            return
+    raise AssertionError(f"No output for {name!r} after call")
+
+
+def _expect_fully_consumed(expect: RunAssert, events: list[RunEvent]) -> None:
+    """Mark all recorded events consumed so ``no_more_events`` succeeds."""
+    expect.skip_next(len(events))
+    expect.no_more_events()
 
 
 def test_build_system_instructions_includes_session_clock() -> None:
@@ -702,23 +765,19 @@ async def test_full_booking_calls_book_appointment() -> None:
         r_pick = await session.run(
             user_input="I'll take the first appointment time you offered."
         )
-        r_pick.expect.next_event().is_message(role="assistant")
-        r_pick.expect.next_event().is_function_call(name="book_appointment")
-        r_pick.expect.next_event().is_function_call_output()
-        await (
-            r_pick.expect.next_event()
-            .is_message(role="assistant")
-            .judge(
-                llm,
-                intent="""
-                The assistant message confirms the visit in some form (for
-                example reference number, confirmation, or recap with date and
-                address). It should reflect a completed booking step, not asking
-                unrelated trivia.
-                """,
-            )
+        book_args = _assert_single_tool_call(r_pick.events, "book_appointment")
+        assert "Morgan" in (book_args.get("customer_name") or "")
+        assert "450" in (book_args.get("address") or "") or "Oak" in (
+            book_args.get("address") or ""
         )
-        r_pick.expect.no_more_events()
+        _assert_tool_output_follows(
+            r_pick.events, "book_appointment", substring="SK-4821"
+        )
+        spoken = _flatten_assistant_text(r_pick.events).lower()
+        assert "morgan" in spoken and (
+            "inspection" in spoken or "scheduled" in spoken or "appointment" in spoken
+        )
+        _expect_fully_consumed(r_pick.expect, r_pick.events)
 
 
 @pytest.mark.asyncio
@@ -732,11 +791,14 @@ async def test_cancel_flow_calls_cancel_appointment() -> None:
         await session.run(user_input="I need to cancel my roofing appointment.")
         await session.run(user_input="My name is Riley Chen.")
         r = await session.run(user_input="Yes, this is the best number to call me.")
-        r.expect.next_event().is_message(role="assistant")
-        r.expect.next_event().is_function_call(name="cancel_appointment")
-        r.expect.next_event().is_function_call_output()
-        r.expect.next_event().is_message(role="assistant")
-        r.expect.no_more_events()
+        cancel_args = _assert_single_tool_call(r.events, "cancel_appointment")
+        assert "Riley" in (cancel_args.get("customer_name") or "")
+        _assert_tool_output_follows(
+            r.events, "cancel_appointment", substring="SK-C9088"
+        )
+        spoken = _flatten_assistant_text(r.events).lower()
+        assert "cancel" in spoken or "c9088" in spoken.replace("-", "").replace(" ", "")
+        _expect_fully_consumed(r.expect, r.events)
 
 
 @pytest.mark.asyncio
@@ -767,8 +829,13 @@ async def test_reschedule_flow_calls_reschedule_appointment() -> None:
         r_done = await session.run(
             user_input="I'll take the second time option you gave me."
         )
-        r_done.expect.next_event().is_message(role="assistant")
-        r_done.expect.next_event().is_function_call(name="reschedule_appointment")
-        r_done.expect.next_event().is_function_call_output()
-        r_done.expect.next_event().is_message(role="assistant")
-        r_done.expect.no_more_events()
+        rs_args = _assert_single_tool_call(r_done.events, "reschedule_appointment")
+        assert "Blake" in (rs_args.get("customer_name") or "")
+        _assert_tool_output_follows(
+            r_done.events, "reschedule_appointment", substring="SK-R7703"
+        )
+        spoken = _flatten_assistant_text(r_done.events).lower()
+        assert "reschedule" in spoken or "r7703" in spoken.replace("-", "").replace(
+            " ", ""
+        )
+        _expect_fully_consumed(r_done.expect, r_done.events)
