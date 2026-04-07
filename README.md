@@ -2,7 +2,7 @@
   <img src="./.github/assets/sk-quality-roofing-logo.png" alt="SK Quality Roofing logo" width="400">
 </p>
 
-# SK Quality Roofing — AI phone receptionist
+# SK Quality Roofing — AI phone receptionist (demo)
 
 Written for **owners and operators**—what this is, why it matters, and how to try it.
 
@@ -30,11 +30,11 @@ Use any phone—regular voice call, no app. After the greeting, ask a question o
 
 ## Two-minute test drive
 
-1. **Compare ZIPs:** Say you want an inspection. Try **33444** (Delray in the sample), then **33435** (Boynton). Notice **which types of visits** Alex can book in each—the Boynton sample includes **more categories** (such as metal, flat, and coating work) than the Delray sample.
-2. **Out of area:** Use **90210**. You should hear a **polite “outside our area”** message and **no booking**.
+1. **Compare ZIPs:** Say you want an inspection. First use **123 East Atlantic Ave, Delray Beach, FL 33444** (sample Delray ZIP **33444**), then **200 N Federal Hwy, Boynton Beach, FL 33435** (sample Boynton ZIP **33435**). Notice **which types of visits** Alex can book in each—the Boynton sample includes **more categories** (such as metal, flat, and coating work) than the Delray sample.
+2. **Out of area:** Use a property in **90210**, e.g. **9400 Wilshire Blvd, Beverly Hills, CA 90210**. You should hear a **polite “outside our area”** message and **no booking**.
 3. **FAQ only:** Ask *“What are common signs my roof needs repair?”* or *“How much does a roof replacement cost?”* You should get a **short, helpful** reply—not a sales script.
-4. **Full booking:** Finish the flow with an in-area ZIP. You’ll get a **sample confirmation code** only; nothing is written to **ServiceTitan** or a **live calendar** in this build.
-5. **Reschedule or cancel:** Give your **name** and confirm **callback number**—Alex **does not** ask for your old appointment time; the demo **always** shows **tomorrow, nine A M to eleven A M, roof repair**, then **cancels** or offers **three new times** to **reschedule** (sample confirmations only).
+4. **Full booking:** Complete the flow with an in-area address, e.g. **123 East Atlantic Ave, Delray Beach, FL 33444**. You’ll get a **sample confirmation code** only; nothing is written to **ServiceTitan** or a **live calendar** in this build.
+5. **Reschedule or cancel:** Give your **name** and confirm **callback number**—Alex **does not** ask for your old appointment time; the demo **always** shows **tomorrow** with a **9:00 AM–11:00 AM** window for **roof repair**, then **cancels** or offers **three new times** to **reschedule** (sample confirmations only).
 
 ## This build vs. next step
 
