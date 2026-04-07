@@ -454,8 +454,8 @@ async def test_solicitor_dismissal() -> None:
 
 
 @pytest.mark.asyncio
-async def test_reschedule_offers_transfer() -> None:
-    """Agent cannot reschedule and offers to connect with the scheduling team."""
+async def test_reschedule_assistant_helps() -> None:
+    """Agent helps reschedule (collects details and/or confirms) rather than refusing."""
     async with (
         _llm() as llm,
         AgentSession(llm=llm) as session,
@@ -470,10 +470,11 @@ async def test_reschedule_offers_transfer() -> None:
             .judge(
                 llm,
                 intent="""
-                The agent explains that it cannot reschedule appointments
-                directly and offers to connect the caller with someone on the
-                scheduling team, or offers a callback. It does NOT attempt
-                to reschedule the appointment itself.
+                The agent helps with rescheduling: it asks for any missing
+                details (name, best callback number, which Thursday date and
+                time window, what new day or time they prefer) OR it confirms
+                it is moving the appointment. It does NOT say it cannot
+                reschedule or that only a human can do it as the only option.
                 """,
             )
         )

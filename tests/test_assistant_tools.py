@@ -77,3 +77,38 @@ async def test_book_appointment_returns_confirmation(assistant: Assistant) -> No
     assert "SK-4821" in out
     assert "April" in out
     assert "9" in out and "11" in out
+
+
+@pytest.mark.asyncio
+async def test_cancel_appointment_returns_confirmation(assistant: Assistant) -> None:
+    ctx = MagicMock()
+    out = await assistant.cancel_appointment(
+        ctx,
+        customer_name="Pat Lee",
+        phone="555-0199",
+        confirmation_reference="SK-4821",
+        scheduled_date="Wednesday April 9 2026",
+        scheduled_time_window="9 to 11 AM",
+        reason="Travel conflict",
+    )
+    assert "SK-C9088" in out
+    assert "Pat Lee" in out
+    assert "removed" in out.lower() or "cancel" in out.lower()
+
+
+@pytest.mark.asyncio
+async def test_reschedule_appointment_returns_confirmation(assistant: Assistant) -> None:
+    ctx = MagicMock()
+    out = await assistant.reschedule_appointment(
+        ctx,
+        customer_name="Pat Lee",
+        phone="555-0199",
+        original_scheduled_date="Wednesday April 9 2026",
+        original_time_window="9 AM to 11 AM",
+        new_scheduled_date="Friday April 11 2026",
+        new_time_window="1 PM to 3 PM",
+        confirmation_reference="SK-4821",
+    )
+    assert "SK-R7703" in out
+    assert "April 9" in out or "April" in out
+    assert "April 11" in out or "Moved" in out
