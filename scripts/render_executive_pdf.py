@@ -18,66 +18,113 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_MD = REPO_ROOT / "docs" / "executive-demo-brief.md"
 DEFAULT_PDF = REPO_ROOT / "docs" / "executive-demo-brief.pdf"
 
+# Tuned for Letter + Story: spacing and hierarchy read better than default browser-ish CSS.
 USER_CSS = """
+html {
+    margin: 0;
+    padding: 0;
+}
 body {
-    font-family: sans-serif;
-    font-size: 11pt;
-    line-height: 1.45;
-    color: #222222;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.5;
+    color: #1a1a1a;
+    margin: 0;
+    padding: 0;
 }
 h1 {
-    font-size: 20pt;
+    font-size: 17pt;
     font-weight: bold;
-    margin: 0 0 14pt 0;
-    line-height: 1.2;
+    line-height: 1.25;
+    margin: 0 0 4pt 0;
+    padding: 0;
+    color: #0d2137;
+    letter-spacing: -0.02em;
 }
 h2 {
-    font-size: 13pt;
+    font-size: 11.5pt;
     font-weight: bold;
-    margin: 20pt 0 8pt 0;
-    padding-bottom: 3pt;
-    border-bottom: 1px solid #cccccc;
+    line-height: 1.3;
+    margin: 18pt 0 8pt 0;
+    padding: 0 0 4pt 0;
+    color: #0d2137;
+    border-bottom: 0.75pt solid #c5d0dc;
 }
-hr {
-    border: none;
-    border-top: 1px solid #cccccc;
-    margin: 16pt 0;
+h2:first-of-type {
+    margin-top: 14pt;
 }
-p { margin: 0 0 9pt 0; }
-ol, ul { margin: 0 0 10pt 20pt; padding-left: 4pt; }
-li { margin: 0 0 5pt 0; }
+p {
+    margin: 0 0 9pt 0;
+    text-align: left;
+}
+ul, ol {
+    margin: 4pt 0 12pt 0;
+    padding-left: 18pt;
+}
+li {
+    margin: 0 0 7pt 0;
+    padding-left: 2pt;
+}
+li:last-child {
+    margin-bottom: 0;
+}
+blockquote {
+    margin: 10pt 0 14pt 0;
+    padding: 11pt 14pt 11pt 16pt;
+    background-color: #eef2f7;
+    border-left: 3pt solid #1e4d7a;
+}
+blockquote p {
+    margin: 0 0 6pt 0;
+    font-size: 10.5pt;
+}
+blockquote p:last-child {
+    margin-bottom: 0;
+}
 code {
-    font-family: ui-monospace, monospace;
-    font-size: 10pt;
-    background-color: #f4f4f4;
-    padding: 1px 4px;
+    font-family: Courier, monospace;
+    font-size: 9.5pt;
+    background-color: #e8ecf1;
+    padding: 1pt 4pt;
 }
-strong { font-weight: bold; }
-em { font-style: italic; }
+strong {
+    font-weight: bold;
+    color: #111111;
+}
+em {
+    font-style: italic;
+}
 """
 
 
 def _md_to_html_fragment(md_text: str) -> str:
+    # Omit nl2br: it turns single newlines into <br>, which often fragments PDF lines awkwardly.
     return markdown.markdown(
         md_text,
-        extensions=["extra", "sane_lists", "nl2br"],
+        extensions=["extra", "sane_lists"],
     )
 
 
 def render_pdf(md_path: Path, pdf_path: Path) -> None:
     md_text = md_path.read_text(encoding="utf-8")
     fragment = _md_to_html_fragment(md_text)
-    html = f"<html><body>{fragment}</body></html>"
+    html = (
+        "<!DOCTYPE html><html><head>"
+        '<meta charset="utf-8">'
+        "</head><body>"
+        f"{fragment}"
+        "</body></html>"
+    )
 
     mediabox = fitz.paper_rect("letter")
     where = fitz.Rect(
-        mediabox.x0 + 72,
-        mediabox.y0 + 72,
-        mediabox.x1 - 72,
-        mediabox.y1 - 72,
+        mediabox.x0 + 63,
+        mediabox.y0 + 63,
+        mediabox.x1 - 63,
+        mediabox.y1 - 63,
     )
 
-    story = fitz.Story(html=html, user_css=USER_CSS, em=11)
+    story = fitz.Story(html=html, user_css=USER_CSS, em=10.5)
     pdf_path.parent.mkdir(parents=True, exist_ok=True)
     writer = fitz.DocumentWriter(pdf_path)
     dev = writer.begin_page(mediabox)
