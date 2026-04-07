@@ -31,6 +31,12 @@ KNOWLEDGE_DIR = Path(__file__).resolve().parent / "knowledge"
 
 INBOUND_GREETING_INSTRUCTIONS = INBOUND_GREETING_PATH.read_text()
 
+# Turn handling: ``endpointing.min_delay`` = minimum silence (seconds) after speech
+# before the user's turn is considered complete. SDK default is 0.5; slightly
+# higher reduces the agent jumping in during short pauses or trailing thought.
+# See ``EndpointingOptions`` in livekit.agents.voice.turn.
+_USER_TURN_MIN_SILENCE_S = 0.75
+
 
 def _session_clock_body(when: datetime, tz: ZoneInfo) -> str:
     """Human + ISO lines for the LLM; fixed at job start (body only — heading added in build)."""
@@ -162,7 +168,10 @@ async def agent(ctx: JobContext):
             model="cartesia/sonic-3",
             voice="9626c31c-bec5-4cca-baa8-f8ba9e84c8bc",
         ),
-        turn_handling=TurnHandlingOptions(turn_detection=EnglishModel()),
+        turn_handling=TurnHandlingOptions(
+            turn_detection=EnglishModel(),
+            endpointing={"min_delay": _USER_TURN_MIN_SILENCE_S},
+        ),
         vad=ctx.proc.userdata["vad"],
         # Speculative LLM/TTS before end-of-turn; improves latency (see LiveKit session docs).
         preemptive_generation=True,
