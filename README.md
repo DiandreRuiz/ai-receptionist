@@ -50,3 +50,7 @@ Use any phone—regular voice call, no app. After the greeting, ask a question o
 Together, that means you can **adjust coverage and offers without rebuilding the voice system from scratch** as the business changes.
 
 The assistant runs on **enterprise-grade real-time voice**, suitable for **cloud** deployment and **standard business phone** connections.
+
+## Why this kind of work can move quickly
+
+Projects like this one can be turned around fast because I work with **several AI software development agents** I **designed and built myself**—each **purpose-built for a different specialty** (for example voice and telephony, prompts and knowledge, tests and quality, or integrations). I **direct** them to the tasks that match their strengths, so parallel work and tight iteration are normal, not accidental. That setup is a big part of how I ship **AI-first** solutions on short timelines without sacrificing structure or reviewability.
