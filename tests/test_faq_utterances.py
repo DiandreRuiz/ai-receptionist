@@ -157,10 +157,14 @@ async def test_faq_signs_roof_needs_repair() -> None:
             .judge(
                 llm,
                 intent="""
-                The answer includes several FAQ themes: missing or damaged
-                shingles, ceiling stains or leaks, sagging, higher energy bills,
-                wear around chimneys or vents, and that a professional should
-                take a look.
+                The answer is grounded in the approved FAQ and names several
+                distinct warning signs—not just one. It should include themes
+                such as damaged or missing shingles (or curling, granule loss,
+                or storm-related damage), and/or interior leak signs like
+                stains, and/or sagging, and/or flashing, valleys, gutters, or
+                drainage—not every one is required, but it must cover multiple
+                concrete signs. It should recommend a professional inspection or
+                roofer rather than DIY for serious issues.
                 """,
             )
         )
