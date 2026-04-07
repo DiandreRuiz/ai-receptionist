@@ -29,27 +29,36 @@ SYSTEM_PROMPT_PATH = PROMPTS_DIR / "receptionist_system_prompt.md"
 INBOUND_GREETING_PATH = PROMPTS_DIR / "greeting.md"
 KNOWLEDGE_DIR = Path(__file__).resolve().parent / "knowledge"
 
-# Business-local “today” for scheduling copy (South Florida).
-SESSION_CLOCK_TZ = ZoneInfo("America/New_York")
-
 INBOUND_GREETING_INSTRUCTIONS = INBOUND_GREETING_PATH.read_text()
 
 
-def _session_clock_context(when: datetime) -> str:
-    """Human + ISO lines for the LLM; fixed at job start."""
-    local = (
-        when.astimezone(SESSION_CLOCK_TZ)
-        if when.tzinfo
-        else when.replace(tzinfo=SESSION_CLOCK_TZ)
-    )
+def _session_clock_body(when: datetime, tz: ZoneInfo) -> str:
+    """Human + ISO lines for the LLM; fixed at job start (body only — heading added in build)."""
+    local = when.astimezone(tz) if when.tzinfo else when.replace(tzinfo=tz)
     spoken = local.strftime("%A, %B %d, %Y at %I:%M %p %Z")
     return (
-        "# Session clock (reference for scheduling)\n\n"
-        f"**Local time when this session started** ({SESSION_CLOCK_TZ.key}): **{spoken}** "
+        f"**Local time when this session started** ({tz.key}): **{spoken}** "
         f"(ISO: {local.isoformat(timespec='seconds')}).\n\n"
         "Treat this as **today** when proposing appointment dates, interpreting phrases like "
         "**“tomorrow”** or **“next week,”** and staying consistent within the call. "
         "This timestamp is from session start, not updated every minute."
+    )
+
+
+def _inbound_line_body(caller_phone: str | None) -> str:
+    """SIP / console caller-ID facts (body only — heading added in build)."""
+    if caller_phone:
+        return (
+            f"The caller ID on this inbound line is **{caller_phone}** (from SIP). "
+            "You may read it back digit-by-digit when confirming the callback number, "
+            "following the **Cartesia** guidance in **block D** below. "
+            "If the caller says it is wrong, use the number they give instead."
+        )
+    return (
+        "You do **not** have this caller's phone number on this connection "
+        "(e.g. console test, web client, or hidden caller ID per trunk/dispatch rules). "
+        "Do **not** say you can see their number or read digits back unless they spoke a number. "
+        "Still ask **“Is this the best number to contact you on?”** as in your booking rules."
     )
 
 
@@ -59,35 +68,33 @@ def build_system_instructions(
     caller_phone: str | None = None,
     session_started_at: datetime | None = None,
 ) -> str:
+    # Prompt-assembly constants (kept inside this function; not module globals).
+    instruction_divider = "\n\n---\n\n"
+    appended_blocks_index = """# Appended: session facts and knowledge bases
+
+**Single merged system message — distinct blocks below.** Scan this index first; **do not** mix up roles (FAQ facts vs. TTS formatting vs. session facts).
+
+- **Block A — Inbound line:** Whether you have the caller's number on **this** connection (SIP).
+- **Block B — Session clock:** Fixed **today** for **this call** when interpreting *tomorrow*, *next week*, and appointment dates.
+- **Block C — Approved FAQ:** **Consult before** answering general roofing or SK questions; approved facts live here.
+- **Block D — Cartesia Sonic-3 TTS:** Rules for **formatting written assistant text** for the voice engine **only** — not facts to read as company policy unless they duplicate the FAQ.
+"""
+    # Business-local "today" for scheduling copy (South Florida).
+    session_clock_tz = ZoneInfo("America/New_York")
+
     base = SYSTEM_PROMPT_PATH.read_text()
-    if caller_phone:
-        line_ctx = (
-            "# Inbound line (session fact)\n\n"
-            f"The caller ID on this inbound line is **{caller_phone}** (from SIP). "
-            "You may read it back digit-by-digit when confirming the callback number, "
-            "following the Cartesia spelling-out guidance below. "
-            "If the caller says it is wrong, use the number they give instead."
-        )
-    else:
-        line_ctx = (
-            "# Inbound line (session fact)\n\n"
-            "You do **not** have this caller's phone number on this connection "
-            "(e.g. console test, web client, or hidden caller ID per trunk/dispatch rules). "
-            "Do **not** say you can see their number or read digits back unless they spoke a number. "
-            "Still ask **“Is this the best number to contact you on?”** as in your booking rules."
-        )
-    clock = session_started_at or datetime.now(SESSION_CLOCK_TZ)
-    clock_ctx = _session_clock_context(clock)
+    line_body = _inbound_line_body(caller_phone)
+    clock = session_started_at or datetime.now(session_clock_tz)
+    clock_body = _session_clock_body(clock, session_clock_tz)
     return (
-        f"{base.rstrip()}\n\n---\n\n"
-        f"{line_ctx}\n\n"
-        f"---\n\n"
-        f"{clock_ctx}\n\n"
-        f"---\n\n"
-        f"# Approved FAQ (verbatim when it matches)\n\n{knowledge.faq_markdown}\n\n"
-        f"---\n\n"
-        f"# Cartesia Sonic-3 TTS (format assistant text for synthesis)\n\n"
-        f"{knowledge.cartesia_tts_best_practices_markdown}"
+        f"{base.rstrip()}{instruction_divider}"
+        f"{appended_blocks_index.strip()}{instruction_divider}"
+        f"## A. Inbound line (this session only)\n\n{line_body}{instruction_divider}"
+        f"## B. Session clock (scheduling anchor for this call)\n\n{clock_body}{instruction_divider}"
+        f"## C. Approved FAQ (verbatim when it matches)\n\n{knowledge.faq_markdown.strip()}"
+        f"{instruction_divider}"
+        f"## D. Cartesia Sonic-3 TTS (assistant text formatting for synthesis)\n\n"
+        f"{knowledge.cartesia_tts_best_practices_markdown.strip()}"
     )
 
 

@@ -1,4 +1,5 @@
 from datetime import datetime
+from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import pytest
@@ -7,6 +8,8 @@ from livekit.agents.voice.run_result import RunAssert
 
 from agent import KNOWLEDGE_DIR, Assistant, build_system_instructions
 from knowledge.loaders import load_knowledge_dir
+
+PROMPTS_DIR = Path(__file__).resolve().parent.parent / "src" / "prompts"
 
 
 def _expect_no_further_events_after_reply(expect: RunAssert) -> None:
@@ -34,9 +37,16 @@ def test_build_system_instructions_includes_session_clock() -> None:
     kb = load_knowledge_dir(KNOWLEDGE_DIR)
     fixed = datetime(2026, 7, 4, 9, 0, tzinfo=ZoneInfo("America/New_York"))
     text = build_system_instructions(kb, session_started_at=fixed)
-    assert "# Session clock" in text
+    assert "## B. Session clock" in text
+    assert "Appended: session facts and knowledge bases" in text
     assert "July" in text and "2026" in text
     assert "2026-07-04T09:00:00-04:00" in text
+
+
+def test_receptionist_prompt_requires_consulting_faq_before_general_answers() -> None:
+    text = (PROMPTS_DIR / "receptionist_system_prompt.md").read_text(encoding="utf-8")
+    assert "Check the FAQ before you answer" in text
+    assert "consult that appended FAQ first" in text
 
 
 def _assert_insurance_storm_response(text: str) -> None:
