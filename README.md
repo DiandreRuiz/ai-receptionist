@@ -2,9 +2,9 @@
   <img src="./.github/assets/sk-quality-roofing-logo.png" alt="SK Quality Roofing logo" width="400">
 </p>
 
-# SK Quality Roofing — AI phone receptionist: project overview
+# SK Quality Roofing — AI phone receptionist: executive summary
 
-Written for **owners and operators**—what this is, why it matters, and how to try it, in plain English.
+Written for **owners and operators**—what this is, why it matters, and how to try it.
 
 **Alex** is the voice assistant on your inbound line. Callers can ask **roofing questions**, get a **yes/no on service area** from the property **ZIP**, hear only **job types you offer in that area**, and go through **scheduling steps** (contact details, address, what’s wrong, preferred times). The goal is fewer calls lost to voicemail and less time spent answering the same general questions at the front desk.
 
@@ -40,4 +40,11 @@ Use any phone—regular voice call, no app. After the greeting, ask a question o
 
 ## Bottom line
 
-You get **after-hours coverage**, **consistent answers** on repeat topics, **tight control over geography and what you book**, and **structured handoff** to the tools your team already runs on—without starting over every time you refine the business. The runtime uses **enterprise-grade real-time voice**, suitable for **cloud** hosting and **standard business phone** connections.
+- **After-hours coverage** — fewer calls lost to voicemail when you’re closed or everyone is on another line.
+- **Consistent answers** — repeat education topics get the **same approved messaging** every time.
+- **Tight control over geography and what you book** — you define **which ZIPs you serve** and **which visit types** are offered in each area.
+- **Structured handoff** — details are captured in a form that maps cleanly to the **CRM and field tools** your team already uses.
+
+Together, that means you can **adjust coverage and offers without rebuilding the voice system from scratch** as the business changes.
+
+The assistant runs on **enterprise-grade real-time voice**, suitable for **cloud** deployment and **standard business phone** connections.
