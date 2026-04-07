@@ -20,6 +20,8 @@ Use any phone—regular voice call, no app. After the greeting, ask a question o
 
 ## Business value
 
+- **Less load on the front desk:** Alex **books**, **reschedules**, and **cancels** appointments and answers **repeat “website” questions**, so your team spends less time on **phone tag** and **intake** and more on **walk-ins, exceptions, and high-touch work**. Routine scheduling and FAQ handling move to the line without replacing judgment where you still want a human.
+- **Flag high-value jobs for review:** The same **structured data** you capture (job type, issue description, notes) can feed **workflows or your CRM** so calls that look like **full replacements, big-ticket estimates, or complex damage** are **marked for front-desk or manager follow-up**—so the **largest revenue opportunities** get a deliberate second look, not lost in the noise.
 - **After hours and busy lines:** The line can pick up **when you’re closed** or **when no one is free**, qualify the homeowner, and collect **callback number, address, issue, and time preferences** for your team. *This version is not connected to your live calendar or dispatch board.*
 - **ZIP-based booking rules:** For **new** visits, Alex only offers **job types you’ve defined for that ZIP** (in the sample data, **33444** and **33435** show **different menus** on purpose).
 - **Changes to existing visits:** Callers can **reschedule** or **cancel** by phone; the demo **always** completes those actions as if an appointment is on file (production would tie into your **CRM / calendar**).
