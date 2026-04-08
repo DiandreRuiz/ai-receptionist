@@ -8,7 +8,7 @@ Written for **owners and operators**—what this is, why it matters, and how to 
 
 **Alex** is the voice assistant on your inbound line. Callers can **book**, **reschedule**, or **cancel** visits; for **new** work, you get a **yes/no on service area** from the property **ZIP** and only **job types you offer in that area**. They can ask **roofing questions** and walk through **the same topics and FAQs your website covers**—installs, repairs, materials, storm and insurance questions, timelines, licensing, and the rest—with **approved answers** that match your messaging. The goal is fewer calls lost to voicemail and less time spent repeating the same explanations at the front desk.
 
-A matching **PDF** is in the repo: **[docs/executive-demo-brief.pdf](docs/executive-demo-brief.pdf)**.
+A **PDF** version of this page is in the repo: **[README.pdf](README.pdf)**. Regenerate after edits: `uv run python scripts/render_readme_pdf.py`.
 
 ## Try it
 
@@ -20,13 +20,13 @@ Use any phone—regular voice call, no app. After the greeting, ask a question o
 
 ## Business value
 
-- **Less load on the front desk:** Alex **books**, **reschedules**, and **cancels** appointments and answers **repeat “website” questions**, so your team spends less time on **phone tag** and **intake** and more on **walk-ins, exceptions, and high-touch work**. Routine scheduling and FAQ handling move to the line without replacing judgment where you still want a human.
-- **Flag high-value jobs for review:** The same **structured data** you capture (job type, issue description, notes) can feed **workflows or your CRM** so calls that look like **full replacements, big-ticket estimates, or complex damage** are **marked for front-desk or manager follow-up**—so the **largest revenue opportunities** get a deliberate second look, not lost in the noise.
-- **After hours and busy lines:** When you **route** inbound calls here **after you’re closed** or **when no one is free**, Alex can pick up, qualify the homeowner, and collect **callback number, address, issue, and time preferences** for your team. The agent **does not read your office hours**—who reaches Alex depends on your **phone routing**. *This version is not connected to your live calendar or dispatch board.*
-- **ZIP-based booking rules:** For **new** visits, Alex only offers **job types** from **`get_bookable_jobs`** for that ZIP (from `src/knowledge/regional_jobs.json`). Menus differ by area—for example **Boca Raton** includes **roof coatings**, **metal**, and **flat** work; **Delray Beach** stays to **installation**, **inspection**, **repair**, and **shingle/tile** options only (with shorter labels like **Installation** / **Inspection** in that region).
-- **Changes to existing visits:** Callers can **reschedule** or **cancel** by phone; the demo **always** completes those actions as if an appointment is on file (production would tie into your **CRM / calendar**).
-- **Website FAQs on the phone:** Education and “I read this on your site” calls are handled with an **approved FAQ** that mirrors **the topics and question-and-answer content from your website**, so callers get **full coverage** of those subjects by voice—without staff repeating the same explanations.
-- **Callback accuracy:** On standard **business phone (SIP)** service, the system can use **incoming caller ID** to double-check the best number to reach them.
+- **Front desk:** **Book**, **reschedule**, **cancel**, and **FAQs** on the line—less **intake** and **phone tag**; staff stay free for **walk-ins**, **exceptions**, and **high-touch** calls.
+- **High-value leads:** **Job type, issue, notes** can feed **CRM/workflows** so **replacements, big estimates, and heavy damage** get **desk or manager follow-up**.
+- **After hours / busy lines:** **Route** calls here when **closed** or **no one’s free**; Alex captures **callback, address, issue, times**. **Routing** decides reachability—Alex **does not** read office hours. *Not connected to live calendar or dispatch in this build.*
+- **ZIP menus:** Only **job types** allowed for that ZIP (`src/knowledge/regional_jobs.json`)—e.g. **Boca** includes **coatings / metal / flat**; **Delray** does not.
+- **Reschedule / cancel:** By phone; **demo** completes with a **stub** visit; **production** ties to **CRM/calendar**.
+- **FAQ:** **Approved** answers match **your site’s topics**—same messaging by voice.
+- **Callback:** **SIP caller ID** (when available) to confirm the **best number**.
 
 ## Two-minute test drive
 
@@ -73,14 +73,14 @@ Use any phone—regular voice call, no app. After the greeting, ask a question o
 
 ## Bottom line
 
-- **After hours and overflow** — when you **send calls** to this line **after hours** or **when staff are tied up**, Alex can answer, capture **who, where, what’s wrong, and preferred times**, and cut **voicemail abandonment** (routing is yours; the agent does not infer open/closed hours).
-- **Less load on the front desk** — **book**, **reschedule**, and **cancel** on the phone plus **repeat FAQ** handling, so your team spends less time on **phone tag** and **intake** and more on **exceptions and high-touch** work.
-- **ZIP-accurate offers** — only **job types you allow per ZIP** (demo: e.g. **roof coatings** in **Boca Raton**, not in **Delray**), so promises match **how you operate by market**.
-- **Website-aligned answers** — callers get **approved FAQ coverage** by voice for the **same topics** they’d read on your site—**consistent messaging** without staff repeating long explanations.
-- **High-value jobs surfaced** — **structured fields** (job type, issue, notes) can feed **CRM or workflows** so **big replacements, heavy damage, or large estimates** are **flagged for front-desk or manager follow-up**.
-- **Accurate callbacks and CRM-ready data** — **SIP caller ID** helps confirm the **best number**; captured details **map cleanly** to **ServiceTitan-style** systems.
+- **After hours & overflow** — **Fewer missed calls** when you **route** here off-hours or when **lines are busy**; Alex captures **who, where, issue, times**.
+- **Front desk** — **Scheduling + FAQs** on Alex; team focuses on **exceptions** and **in-person** work.
+- **ZIP truth** — Only **job types you allow per ZIP** (demo: **coatings** in **Boca**, not **Delray**).
+- **One voice** — **FAQ-backed** replies aligned with **the website**.
+- **Bigger jobs visible** — **Structured intake** can **flag** **replacements / major work** for **CRM** follow-up.
+- **CRM-ready** — **SIP** improves **callback** confirmation; fields fit **ServiceTitan-style** systems.
 
-Together, that means you can **adjust ZIPs, menus, and FAQ in simple files** and **iterate** without rebuilding the **voice layer** from scratch as the business changes.
+**Config:** Tweak **ZIPs, menus, and FAQ** in **files**—no need to rebuild the **voice layer** every time the business shifts.
 
 The assistant runs on **enterprise-grade real-time voice**, suitable for **cloud** deployment and **standard business phone** connections.
 
